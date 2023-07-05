@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect, useCallback} from 'react';
+import React, {useState, useEffect} from 'react';
 
 
 export function Waveform({ pcm, playhead }) {

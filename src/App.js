@@ -1,13 +1,11 @@
-import React, {useState, useRef, useEffect, useCallback} from 'react';
+import React, {useState} from 'react';
 import './App.css';
 import MinimapPlugin from 'wavesurfer.js/dist/plugins/minimap';
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline';
 import RegionsPlugin from "wavesurfer.js/dist/plugins/regions";
 
 import { useMediaRecorder } from './hooks/useMediaRecorder';
-import { Waveform } from './components/Waveform';
-import { WaveSurferPlayer } from './components/WaveSurferPlayer';
-
+import { Waveform, WaveSurferPlayer } from './components';
 
 function getPCM(blob) {
   return new Promise((resolve, reject) => {

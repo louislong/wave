@@ -4,7 +4,7 @@ import useWavesurfer from '../hooks/useWavesurfer';
 
 // Create a React component that will render wavesurfer.
 // Props are wavesurfer options.
-export const WaveSurferPlayer = (props) => {
+const WaveSurferPlayer = (props) => {
   const containerRef = useRef()
   const spectrogramRef = useRef()
   const activeRegionRef = useRef()
@@ -92,3 +92,5 @@ export const WaveSurferPlayer = (props) => {
     </>
   )
 }
+
+export default WaveSurferPlayer

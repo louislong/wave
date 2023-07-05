@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect, useCallback} from 'react';
+import {useState, useRef} from 'react';
 
 function useUserMedia(constraints) {
   const [stream, setStream] = useState();
