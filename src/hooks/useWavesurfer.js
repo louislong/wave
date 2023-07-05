@@ -2,9 +2,16 @@ import React, {useState, useRef, useEffect, useCallback} from 'react';
 
 import WaveSurfer from "wavesurfer.js";
 import SpectrogramPlugin from "wavesurfer.js/dist/plugins/spectrogram";
+import colormap from "colormap";
+
+const colors = colormap({
+  colormap: 'winter',  // https://www.npmjs.com/package/colormap
+  nshades: 256,
+  format: 'float'
+});
 
 // WaveSurfer hook
-const useWavesurfer = (containerRef, options) => {
+const useWavesurfer = (containerRef, spectrogramRef, options) => {
   const [wavesurfer, setWavesurfer] = useState(null)
 
   // Initialize wavesurfer when the container mounts
@@ -19,8 +26,10 @@ const useWavesurfer = (containerRef, options) => {
 
     ws.registerPlugin(
       SpectrogramPlugin.create({
+        container: spectrogramRef.current,
         labels: true,
         height: 256,
+        colorMap: colors,
       }),
     )
 
@@ -29,7 +38,7 @@ const useWavesurfer = (containerRef, options) => {
     return () => {
       ws.destroy()
     }
-  }, [options, containerRef])
+  }, [options, containerRef, spectrogramRef])
 
   return wavesurfer
 }

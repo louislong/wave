@@ -6,11 +6,12 @@ import useWavesurfer from '../hooks/useWavesurfer';
 // Props are wavesurfer options.
 export const WaveSurferPlayer = (props) => {
   const containerRef = useRef()
+  const spectrogramRef = useRef()
   const activeRegionRef = useRef()
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
 
-  const wavesurfer = useWavesurfer(containerRef, props)
+  const wavesurfer = useWavesurfer(containerRef, spectrogramRef, props)
 
   // On play button click
   const onPlayClick = useCallback(() => {
@@ -81,8 +82,8 @@ export const WaveSurferPlayer = (props) => {
 
   return (
     <>
-      <div ref={containerRef} style={{ minHeight: '120px' }} />
-
+      <div ref={containerRef} style={{ minHeight: '120px', paddingInline: '100px' }} />
+      <div ref={spectrogramRef} style={{margin: '10px auto', position: 'relative', paddingInline: '100px'}} />
       <button onClick={onPlayClick} style={{ marginTop: '1em' }}>
         {isPlaying ? 'Pause' : 'Play'}
       </button>
