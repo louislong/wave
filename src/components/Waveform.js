@@ -17,14 +17,14 @@ export function Waveform({ pcm, playhead }) {
       style: { width, height, ...style },
     };
   }
-  return <canvas ref={setCanvasRef} {...prettyCanvas(640, 200, { backgroundColor: '#BFBFBF' })} />;
+  return <canvas ref={setCanvasRef} {...prettyCanvas(640, 200, {width: '100%'})} />;
 }
 
 function drawPCM(values, canvas, playhead) {
   const ctx = canvas.getContext('2d');
   let { width: clientWidth, height: clientHeight } = canvas;
   canvas.width = clientWidth;
-  const scale = 2;
+  const scale = 1;
   ctx.scale(scale, scale);
   clientWidth /= scale; // scale down for pretty canvas
   clientHeight /= scale;
@@ -43,8 +43,8 @@ function drawPCM(values, canvas, playhead) {
   averageValues.forEach((value, index) => {
     const height = (((value / max) * clientHeight) / 2) * 0.9;
     ctx.beginPath();
-    ctx.strokeStyle = `#3535C3`;
-    ctx.fillStyle = `#6464D8`;
+    ctx.strokeStyle = `rgb(200, 0, 200)`;
+    ctx.fillStyle = `rgb(200, 0, 200)`;
     const args = [index * blockSize, clientHeight / 2 - (absoluteValues ? height / 2 : 0), blockSize, height];
     const borderRadius = Math.floor(Math.min(args[2], args[3]) / 2);
     ctx.fillRect(index * blockSize, clientHeight / 2 - (absoluteValues ? height / 2 : 0), blockSize, height);
