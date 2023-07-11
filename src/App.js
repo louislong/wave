@@ -50,7 +50,7 @@ const App = () => {
       setPcm(await getPCM(audioBlob));
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
-      audio.controls = true
+      // audio.controls = true
       setAudioUrl(audioUrl)
       console.warn('audioUrl', audio)
       // audio.play();

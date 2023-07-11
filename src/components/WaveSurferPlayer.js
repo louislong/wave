@@ -2,6 +2,13 @@ import React, {useState, useRef, useEffect, useCallback} from 'react';
 
 import useWavesurfer from '../hooks/useWavesurfer';
 
+const formatTime = (seconds) => {
+  const minutes = Math.floor(seconds / 60)
+  const secondsRemainder = Math.round(seconds) % 60
+  const paddedSeconds = `0${secondsRemainder}`.slice(-2)
+  return `${minutes}:${paddedSeconds}`
+}
+
 // Create a React component that will render wavesurfer.
 // Props are wavesurfer options.
 const WaveSurferPlayer = (props) => {
@@ -10,11 +17,13 @@ const WaveSurferPlayer = (props) => {
   const activeRegionRef = useRef()
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState()
 
   const wavesurfer = useWavesurfer(containerRef, spectrogramRef, props)
 
   // On play button click
   const onPlayClick = useCallback(() => {
+    console.warn('wavesurfer', wavesurfer)
     wavesurfer.isPlaying() ? wavesurfer.pause() : wavesurfer.play()
   }, [wavesurfer])
 
@@ -40,10 +49,10 @@ const WaveSurferPlayer = (props) => {
     const subscriptions = [
       wavesurfer.on('play', () => setIsPlaying(true)),
       wavesurfer.on('pause', () => setIsPlaying(false)),
-      wavesurfer.on('timeupdate', (currentTime) => setCurrentTime(currentTime)),
       // Create some regions at specific time ranges
       // Track the time
       wavesurfer.on('timeupdate', (currentTime) => {
+        setCurrentTime(currentTime)
         console.warn('timeupdate', currentTime)
         let activeRegion = activeRegionRef.current
         // When the end of the region is reached
@@ -57,11 +66,14 @@ const WaveSurferPlayer = (props) => {
           }
         }
       }),
-      wavesurfer.on('decode', () => {
+      wavesurfer.on('decode', (duration) => {
+        // set duration time
+        setDuration(formatTime(duration))
         wsRegions.addRegion({
           start: 4,
           end: 7,
           content: 'Blue',
+          resize: false,
           color: 'rgba(123,23,200, 0.5)',
         })
         wsRegions.addRegion({
@@ -87,8 +99,9 @@ const WaveSurferPlayer = (props) => {
       <button onClick={onPlayClick} style={{ marginTop: '1em' }}>
         {isPlaying ? 'Pause' : 'Play'}
       </button>
+      <text>{duration}</text>
 
-      <p>Seconds played: {currentTime}</p>
+      <p>Seconds played: {formatTime(currentTime)}</p>
     </>
   )
 }
