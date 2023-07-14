@@ -43,8 +43,8 @@ function drawPCM(values, canvas, playhead) {
   averageValues.forEach((value, index) => {
     const height = (((value / max) * clientHeight) / 2) * 0.9;
     ctx.beginPath();
-    ctx.strokeStyle = `rgb(200, 0, 200)`;
-    ctx.fillStyle = `rgb(200, 0, 200)`;
+    ctx.strokeStyle = `#ff4e00`;
+    ctx.fillStyle = `#ff4e00`;
     const args = [index * blockSize, clientHeight / 2 - (absoluteValues ? height / 2 : 0), blockSize, height];
     const borderRadius = Math.floor(Math.min(args[2], args[3]) / 2);
     ctx.fillRect(index * blockSize, clientHeight / 2 - (absoluteValues ? height / 2 : 0), blockSize, height);

@@ -37,8 +37,8 @@ export function useMediaRecorder({ onStart, onStop, onData }) {
       setState(_recorder.state);
     });
     _recorder.addEventListener('stop', (event) => {
-      console.warn('stopped', event.data)
-      onStop && onStop(audioChunks.current);
+      console.warn('stopped', event)
+      onStop && onStop(audioChunks.current, _recorder.mimeType);
       setState(_recorder.state);
     });
   }

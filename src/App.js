@@ -45,8 +45,8 @@ const App = () => {
       setPcm(undefined)
       setAudioUrl(undefined)
     },
-    onStop: async (audioChunks) => {
-      const audioBlob = new Blob(audioChunks);
+    onStop: async (audioChunks, type) => {
+      const audioBlob = new Blob(audioChunks, { type });
       setPcm(await getPCM(audioBlob));
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
@@ -83,12 +83,14 @@ const App = () => {
             state !== 'recording' &&
             <WaveSurferPlayer
               height={100}
-              waveColor="rgb(200, 0, 200)"
-              progressColor="rgb(100, 0, 100)"
-              cursorColor='#57BAB6'
-              cursorWidth={2}
+              waveColor="#ff4e00"
+              progressColor="#dd5e98"
+              cursorColor='#ddd5e9'
+              cursorWidth={1}
               url={audioUrl}
+              minPxPerSec={1} /** Minimum pixels per second of audio (i.e. zoom level) */
               wsRegions={wsRegions}
+              interact={true}
               plugins={[
                 wsRegions,
                 TimelinePlugin.create(),

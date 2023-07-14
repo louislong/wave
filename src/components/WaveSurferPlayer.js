@@ -23,12 +23,12 @@ const WaveSurferPlayer = (props) => {
 
   // On play button click
   const onPlayClick = useCallback(() => {
-    console.warn('wavesurfer', wavesurfer)
-    wavesurfer.isPlaying() ? wavesurfer.pause() : wavesurfer.play()
-  }, [wavesurfer])
+    console.warn('wavesurfer', wavesurfer.isPlaying())
+    isPlaying ? wavesurfer.pause() : wavesurfer.play()
+  }, [wavesurfer, isPlaying])
 
   // Loop a region on click
-  const loop = false
+  const loop = true
   const { wsRegions } = props
 
   wsRegions.on('region-clicked', (region, e) => {
@@ -43,12 +43,15 @@ const WaveSurferPlayer = (props) => {
   useEffect(() => {
     if (!wavesurfer) return
 
-    setCurrentTime(0)
-    setIsPlaying(false)
-
     const subscriptions = [
-      wavesurfer.on('play', () => setIsPlaying(true)),
-      wavesurfer.on('pause', () => setIsPlaying(false)),
+      wavesurfer.on('play', () => {
+        console.warn('play wavesurfer')
+        setIsPlaying(true)
+      }),
+      wavesurfer.on('pause', () => {
+        console.warn('pause wavesurfer')
+        setIsPlaying(false)
+      } ),
       // Create some regions at specific time ranges
       // Track the time
       wavesurfer.on('timeupdate', (currentTime) => {
@@ -68,11 +71,14 @@ const WaveSurferPlayer = (props) => {
       }),
       wavesurfer.on('decode', (duration) => {
         // set duration time
+        console.warn('decode wavesurfer')
         setDuration(formatTime(duration))
+        setCurrentTime(0)
+        setIsPlaying(false)
         wsRegions.addRegion({
           start: 4,
           end: 7,
-          content: 'Blue',
+          content: 'Region',
           resize: false,
           color: 'rgba(123,23,200, 0.5)',
         })
@@ -90,7 +96,7 @@ const WaveSurferPlayer = (props) => {
     return () => {
       subscriptions.forEach((unsub) => unsub())
     }
-  }, [wavesurfer])
+  }, [wavesurfer, loop, wsRegions])
 
   return (
     <>
