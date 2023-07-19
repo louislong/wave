@@ -23,8 +23,10 @@ const WaveSurferPlayer = (props) => {
 
   // On play button click
   const onPlayClick = useCallback(() => {
-    console.warn('wavesurfer', wavesurfer.isPlaying())
+    console.warn('--------init waversurfer ---------', wavesurfer?.media)
     isPlaying ? wavesurfer.pause() : wavesurfer.play()
+    // wavesurfer?.media.play()
+    // wavesurfer.playPause()
   }, [wavesurfer, isPlaying])
 
   // Loop a region on click
@@ -73,11 +75,11 @@ const WaveSurferPlayer = (props) => {
         // set duration time
         console.warn('decode wavesurfer')
         setDuration(formatTime(duration))
-        setCurrentTime(0)
-        setIsPlaying(false)
+        // setCurrentTime(0)
+        // setIsPlaying(false)
         wsRegions.addRegion({
-          start: 4,
-          end: 7,
+          start: 2,
+          end: 4,
           content: 'Region',
           resize: false,
           color: 'rgba(123,23,200, 0.5)',
@@ -106,6 +108,7 @@ const WaveSurferPlayer = (props) => {
         {isPlaying ? 'Pause' : 'Play'}
       </button>
       <text>{duration}</text>
+      <a href={props.url} download={'recording.webm'}>Download audio</a>
 
       <p>Seconds played: {formatTime(currentTime)}</p>
     </>

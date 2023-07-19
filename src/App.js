@@ -7,6 +7,8 @@ import RegionsPlugin from "wavesurfer.js/dist/plugins/regions";
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
 import StopRoundedIcon from '@mui/icons-material/StopRounded';
 
+// import Crunker from 'crunker'
+
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import IconButton from '@mui/material/IconButton';
@@ -14,7 +16,10 @@ import IconButton from '@mui/material/IconButton';
 import { useMediaRecorder } from './hooks/useMediaRecorder';
 import { Waveform, WaveSurferPlayer } from './components';
 
-function getPCM(blob) {
+const TIME_SLICES = 200; // in miliseconds
+const WAVEFORM_DURATION = 5000; // 5 seconds
+
+function getPCM(blob, counter) {
   return new Promise((resolve, reject) => {
     const fileReader = new FileReader();
     fileReader.onloadend = () => {
@@ -25,7 +30,20 @@ function getPCM(blob) {
       audioContext.decodeAudioData(arrayBuffer, (audioBuffer) => {
         // Do something with audioBuffer
         const pcm = audioBuffer.getChannelData(0);
-        resolve(pcm);
+
+        const threshold = WAVEFORM_DURATION / TIME_SLICES
+        if (counter > 25) {
+          const start = Math.floor((counter - threshold) / counter * pcm.length)
+          resolve(pcm.slice(start))
+        } else {
+          resolve(pcm);
+        }
+
+        // get the start according to the fixed value 10584
+        // const NumberOfChunks = 10584 * 5000 / TIME_SLICES;  // 10584 one time, total size for 5 second
+        // const startIndex = pcm.length > NumberOfChunks ? pcm.length - NumberOfChunks : 0
+
+        // resolve(pcm.slice(startIndex));
       }, err => reject(err));
     };
     fileReader.onerror = reject;
@@ -46,18 +64,50 @@ const App = () => {
       setAudioUrl(undefined)
     },
     onStop: async (audioChunks, type) => {
+
+      // let crunker = new Crunker();
+      // let blobUrls = audioChunks.map(chunck => URL.createObjectURL(chunck))
+
+      // crunker
+      //   .fetchAudio(...blobUrls)
+      //   .then((buffers) => {
+      //     // => [AudioBuffer, AudioBuffer]
+      //     return crunker.mergeAudio(buffers);
+      //   })
+      //   .then((merged) => {
+      //     // => AudioBuffer
+      //     return crunker.export(merged, 'audio/*');
+      //   })
+      //   .then((output) => {
+      //     // => {blob, element, url}
+      //     crunker.download(output.blob);
+      //     // document.body.append(output.element);
+      //     console.log(output.url);
+      //     setAudioUrl(output.url)
+      //   })
+      //   .catch((error) => {
+      //     // => Error Message
+      //   });
+
       const audioBlob = new Blob(audioChunks, { type });
-      setPcm(await getPCM(audioBlob));
+      // setPcm(await getPCM(audioBlob));
       const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
+      // const audio = new Audio(audioUrl);
       // audio.controls = true
       setAudioUrl(audioUrl)
-      console.warn('audioUrl', audio)
+      console.warn('audioUrl', audioUrl)
       // audio.play();
     },
-    onData: async (_, audioChunks) => {
+    onData: async (counter, audioChunks) => {
+      // const NumberOfChunks = 5000 / TIME_SLICES;
+      // let FiveSecondChunks = audioChunks
+      // if (audioChunks.length > NumberOfChunks) {
+      //   FiveSecondChunks = audioChunks.slice(0, 1).concat(audioChunks.slice(audioChunks.length - NumberOfChunks))
+      // }
+      // const startIndex = audioChunks.length > NumberOfChunks ? audioChunks.length - NumberOfChunks : 0
+      console.warn('counter', counter)
       const audioBlob = new Blob(audioChunks);
-      setPcm(await getPCM(audioBlob));
+      setPcm(await getPCM(audioBlob, counter));
     },
   });
   return (
@@ -67,7 +117,7 @@ const App = () => {
         <Container disableGutters={true} sx={{position: 'absolute', bottom: '5vh', justifyContent: 'center', display: 'flex', width: '100%'}}>
           {
             state === 'inactive' ?
-            <IconButton onClick={() => start(200)} >
+            <IconButton onClick={() => start(TIME_SLICES)} >
               <KeyboardVoiceIcon sx={{ fontSize: 30, borderRadius: '100px', padding: '20px', backgroundColor: '#f03', color: 'white' }} />
             </IconButton> :
             <IconButton onClick={() => stop()}>
