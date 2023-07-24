@@ -15,11 +15,12 @@ import IconButton from '@mui/material/IconButton';
 
 import { useMediaRecorder } from './hooks/useMediaRecorder';
 import { Waveform, WaveSurferPlayer } from './components';
+import audioBufferToWav from './util/bufferToWav';
 
 const TIME_SLICES = 200; // in miliseconds
 const WAVEFORM_DURATION = 5000; // 5 seconds
 
-function getPCM(blob, counter) {
+function getPCM(willConvert, blob, counter) {
   return new Promise((resolve, reject) => {
     const fileReader = new FileReader();
     fileReader.onloadend = () => {
@@ -28,22 +29,26 @@ function getPCM(blob, counter) {
       window.AudioContext = window.AudioContext || window.webkitAudioContext;
       const audioContext = new AudioContext();
       audioContext.decodeAudioData(arrayBuffer, (audioBuffer) => {
-        // Do something with audioBuffer
-        const pcm = audioBuffer.getChannelData(0);
-
-        const threshold = WAVEFORM_DURATION / TIME_SLICES
-        if (counter > 25) {
-          const start = Math.floor((counter - threshold) / counter * pcm.length)
-          resolve(pcm.slice(start))
+        if (willConvert) {
+          const wav = audioBufferToWav(audioBuffer)
+          const blob = new window.Blob([ new DataView(wav) ], {
+            type: 'audio/wav'
+          })
+  
+          const url = window.URL.createObjectURL(blob)
+          resolve(url);
         } else {
-          resolve(pcm);
+          // get 5 seconds pcm data
+          const pcm = audioBuffer.getChannelData(0);
+
+          const threshold = WAVEFORM_DURATION / TIME_SLICES
+          if (counter > 25) {
+            const start = Math.floor((counter - threshold) / counter * pcm.length)
+            resolve(pcm.slice(start))
+          } else {
+            resolve(pcm);
+          }
         }
-
-        // get the start according to the fixed value 10584
-        // const NumberOfChunks = 10584 * 5000 / TIME_SLICES;  // 10584 one time, total size for 5 second
-        // const startIndex = pcm.length > NumberOfChunks ? pcm.length - NumberOfChunks : 0
-
-        // resolve(pcm.slice(startIndex));
       }, err => reject(err));
     };
     fileReader.onerror = reject;
@@ -54,6 +59,8 @@ function getPCM(blob, counter) {
 const App = () => {
   const [pcm, setPcm] = useState();
   const [audioUrl, setAudioUrl] = useState();
+  const [wavUrl, setWavUrl] = useState();
+
   // Create a Regions plugin instance
   const wsRegions = RegionsPlugin.create();
 
@@ -90,24 +97,14 @@ const App = () => {
       //   });
 
       const audioBlob = new Blob(audioChunks, { type });
-      // setPcm(await getPCM(audioBlob));
       const audioUrl = URL.createObjectURL(audioBlob);
-      // const audio = new Audio(audioUrl);
-      // audio.controls = true
       setAudioUrl(audioUrl)
-      console.warn('audioUrl', audioUrl)
-      // audio.play();
+      setWavUrl(await getPCM(true, audioBlob))
     },
     onData: async (counter, audioChunks) => {
-      // const NumberOfChunks = 5000 / TIME_SLICES;
-      // let FiveSecondChunks = audioChunks
-      // if (audioChunks.length > NumberOfChunks) {
-      //   FiveSecondChunks = audioChunks.slice(0, 1).concat(audioChunks.slice(audioChunks.length - NumberOfChunks))
-      // }
-      // const startIndex = audioChunks.length > NumberOfChunks ? audioChunks.length - NumberOfChunks : 0
       console.warn('counter', counter)
       const audioBlob = new Blob(audioChunks);
-      setPcm(await getPCM(audioBlob, counter));
+      setPcm(await getPCM(false, audioBlob, counter));
     },
   });
   return (
@@ -138,6 +135,7 @@ const App = () => {
               cursorColor='#ddd5e9'
               cursorWidth={1}
               url={audioUrl}
+              wavUrl={wavUrl}
               minPxPerSec={1} /** Minimum pixels per second of audio (i.e. zoom level) */
               wsRegions={wsRegions}
               interact={true}
