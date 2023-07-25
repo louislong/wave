@@ -108,8 +108,15 @@ const WaveSurferPlayer = (props) => {
         {isPlaying ? 'Pause' : 'Play'}
       </button>
       <text>{duration}</text>
-      <a href={props.wavUrl} download={'recording.wav'}>Download audio</a>
-
+      {
+        props.wavUrl && 
+        <>
+          <a href={props.wavUrl} download={'recording.wav'}>Download audio</a>
+          <button onClick={props.handleData} style={{ marginTop: '1em' }}>
+            {'Anaylze'}
+          </button>
+        </>
+      }
       <p>Seconds played: {formatTime(currentTime)}</p>
     </>
   )

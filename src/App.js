@@ -34,9 +34,7 @@ function getPCM(willConvert, blob, counter) {
           const blob = new window.Blob([ new DataView(wav) ], {
             type: 'audio/wav'
           })
-  
-          const url = window.URL.createObjectURL(blob)
-          resolve(url);
+          resolve(blob);
         } else {
           // get 5 seconds pcm data
           const pcm = audioBuffer.getChannelData(0);
@@ -60,6 +58,7 @@ const App = () => {
   const [pcm, setPcm] = useState();
   const [audioUrl, setAudioUrl] = useState();
   const [wavUrl, setWavUrl] = useState();
+  const [wavBlob, setWavBlob] = useState();
 
   // Create a Regions plugin instance
   const wsRegions = RegionsPlugin.create();
@@ -99,7 +98,10 @@ const App = () => {
       const audioBlob = new Blob(audioChunks, { type });
       const audioUrl = URL.createObjectURL(audioBlob);
       setAudioUrl(audioUrl)
-      setWavUrl(await getPCM(true, audioBlob))
+      const blob = await getPCM(true, audioBlob)
+      setWavBlob(blob)
+      const wavUrl = URL.createObjectURL(blob)
+      setWavUrl(wavUrl)
     },
     onData: async (counter, audioChunks) => {
       console.warn('counter', counter)
@@ -107,6 +109,30 @@ const App = () => {
       setPcm(await getPCM(false, audioBlob, counter));
     },
   });
+
+  const handleData = () => {
+    const formData = new FormData();
+    const file = new File([wavBlob], 'test.wav')
+
+    formData.append('file', file);
+
+    fetch('http://3.135.20.213/StethyAPI', {
+      method: 'POST',
+      headers: {
+        // 'Content-Type': 'multipart/form-data',
+        // 'Content-Type': 'audio/wave',
+        'Accept': '*/*',
+      },
+      body: formData
+    })
+    .then((response) => response.json())
+    .then((result) => {
+      console.log('Success:', result);
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+  }
   return (
     <>
     <Container disableGutters={true} maxWidth="lg">
@@ -139,6 +165,7 @@ const App = () => {
               minPxPerSec={1} /** Minimum pixels per second of audio (i.e. zoom level) */
               wsRegions={wsRegions}
               interact={true}
+              handleData={handleData}
               plugins={[
                 wsRegions,
                 TimelinePlugin.create(),
