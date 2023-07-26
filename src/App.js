@@ -10,6 +10,7 @@ import StopRoundedIcon from '@mui/icons-material/StopRounded';
 // import Crunker from 'crunker'
 
 import Box from '@mui/material/Box';
+import { Grid } from '@mui/material';
 import Container from '@mui/material/Container';
 import IconButton from '@mui/material/IconButton';
 
@@ -134,21 +135,10 @@ const App = () => {
     });
   }
   return (
-    <>
-    <Container disableGutters={true} maxWidth="lg">
-      <Box sx={{ bgcolor: '#cfe8fc', height: '100vh', }}>
-        <Container disableGutters={true} sx={{position: 'absolute', bottom: '5vh', justifyContent: 'center', display: 'flex', width: '100%'}}>
-          {
-            state === 'inactive' ?
-            <IconButton onClick={() => start(TIME_SLICES)} >
-              <KeyboardVoiceIcon sx={{ fontSize: 30, borderRadius: '100px', padding: '20px', backgroundColor: '#f03', color: 'white' }} />
-            </IconButton> :
-            <IconButton onClick={() => stop()}>
-              <StopRoundedIcon sx={{ fontSize: 30, borderRadius: '100px', padding: '20px', backgroundColor: '#f03', color: 'white' }} />
-            </IconButton>
-          }
-        </Container>
-        <Container disableGutters={true} sx={{position: 'absolute', bottom: '15vh', width: '90vw',}}>
+    <Box sx={{ flexGrow: 1, backgroundColor: 'lightblue' }}>
+      <Grid direction="column" justifyContent="center" alignItems="center" container spacing={2} sx={{ height: '100vh', width: '100vw'}}>
+        <Grid item sx={{ display: 'flex' }} xs={10} justifyContent="center" alignItems="center">
+          <Container disableGutters sx={{width: '100vw'}}>
           {
             state === 'recording' && pcm && <Waveform pcm={pcm} />
           }
@@ -178,11 +168,21 @@ const App = () => {
               ]}
             />
           }
-        </Container>
-        
-      </Box>
-    </Container>
-    </>
+          </Container>
+        </Grid>
+        <Grid item xs={2}>
+          {
+            state === 'inactive' ?
+            <IconButton onClick={() => start(TIME_SLICES)} >
+              <KeyboardVoiceIcon sx={{ fontSize: 30, borderRadius: '100px', padding: '20px', backgroundColor: '#f03', color: 'white' }} />
+            </IconButton> :
+            <IconButton onClick={() => stop()}>
+              <StopRoundedIcon sx={{ fontSize: 30, borderRadius: '100px', padding: '20px', backgroundColor: '#f03', color: 'white' }} />
+            </IconButton>
+          }
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 export default App;

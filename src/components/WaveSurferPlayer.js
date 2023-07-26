@@ -102,20 +102,20 @@ const WaveSurferPlayer = (props) => {
 
   return (
     <>
-      <div ref={containerRef} style={{ minHeight: '120px', paddingInline: '100px' }} />
-      <div ref={spectrogramRef} style={{margin: '10px auto', position: 'relative', paddingInline: '100px'}} />
-      <button onClick={onPlayClick} style={{ marginTop: '1em' }}>
+      <div ref={containerRef} style={{ minHeight: '120px', paddingInline: '1%'}} />
+      <div ref={spectrogramRef} style={{margin: '10px auto', position: 'relative', paddingInline: '1%'}} />
+      <button onClick={onPlayClick} style={{ marginTop: '1em', paddingInline: '1%' }}>
         {isPlaying ? 'Pause' : 'Play'}
       </button>
       <text>{duration}</text>
       {
         props.wavUrl && 
-        <>
+        <div style={{paddingInline: '1%'}}>
           <a href={props.wavUrl} download={'recording.wav'}>Download audio</a>
-          <button onClick={props.handleData} style={{ marginTop: '1em' }}>
+          <button onClick={props.handleData} style={{ marginTop: '1em', paddingInline: '1%' }}>
             {'Anaylze'}
           </button>
-        </>
+        </div>
       }
       <p>Seconds played: {formatTime(currentTime)}</p>
     </>
