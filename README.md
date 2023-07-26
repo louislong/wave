@@ -29,6 +29,16 @@ Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
+### npm run deploy
+
+Deploy the app to github pages. 
+
+run `npm run deploy` to auto deploy your changes to github pages
+
+You will be good if you see 'Published' in the terminal
+
+Finally, note that deploy can take a minute or two to update, so be mindful of that when checking the live site.
+
 ### `npm run eject`
 
 **Note: this is a one-way operation. Once you `eject`, you can't go back!**
