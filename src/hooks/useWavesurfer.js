@@ -28,7 +28,9 @@ const useWavesurfer = (containerRef, spectrogramRef, options) => {
       SpectrogramPlugin.create({
         container: spectrogramRef.current,
         labels: true,
-        height: 256,
+        height: 180,
+        frequencyMin: 0,
+        // frequencyMax: 625,
         colorMap: colors,
       }),
     )

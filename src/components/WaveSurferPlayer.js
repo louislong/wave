@@ -1,4 +1,13 @@
 import React, {useState, useRef, useEffect, useCallback} from 'react';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
+import DownloadIcon from '@mui/icons-material/Download';
+import TroubleshootIcon from '@mui/icons-material/Troubleshoot';
+import PlaceIcon from '@mui/icons-material/Place';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+
+import Button from '@mui/material/Button';
+import { Stack } from '@mui/material';
 
 import useWavesurfer from '../hooks/useWavesurfer';
 
@@ -84,11 +93,11 @@ const WaveSurferPlayer = (props) => {
           resize: false,
           color: 'rgba(123,23,200, 0.5)',
         })
-        wsRegions.addRegion({
-          start: 5,
-          content: 'Marker',
-          color: 'green'
-        })
+        // wsRegions.addRegion({
+        //   start: 5,
+        //   content: 'Marker',
+        //   color: 'green'
+        // })
       }),
       wavesurfer.on('interaction', () => {
         activeRegionRef.current = null
@@ -102,22 +111,32 @@ const WaveSurferPlayer = (props) => {
 
   return (
     <>
-      <div ref={containerRef} style={{ minHeight: '120px', paddingInline: '1%'}} />
+      <div ref={containerRef} style={{ minHeight: '120px', paddingInline: '1%',}} />
       <div ref={spectrogramRef} style={{margin: '10px auto', position: 'relative', paddingInline: '1%'}} />
-      <button onClick={onPlayClick} style={{ marginTop: '1em', paddingInline: '1%' }}>
-        {isPlaying ? 'Pause' : 'Play'}
-      </button>
-      <text>{duration}</text>
       {
         props.wavUrl && 
-        <div style={{paddingInline: '1%'}}>
-          <a href={props.wavUrl} download={'recording.wav'}>Download audio</a>
-          <button onClick={props.handleData} style={{ marginTop: '1em', paddingInline: '1%' }}>
-            {'Anaylze'}
-          </button>
-        </div>
+        <Stack justifyContent="space-between" direction={{ xs: 'column', sm: 'row' }}>
+          <Stack sx={{paddingLeft: '1%', paddingTop: '10px'}} direction={'row'} spacing={{ xs: 1, sm: 2, md: 4 }}>
+            <Button color="secondary" onClick={onPlayClick} variant="contained" endIcon={isPlaying ? <PauseIcon /> : <PlayArrowIcon />}>
+              {isPlaying ? 'Pause' : 'Play'}
+            </Button>
+            <Button color="secondary" variant="contained" endIcon={<DownloadIcon />}>
+              <a style={{textDecoration: 'none', color: 'white'}} href={props.wavUrl} download={'recording.wav'} >Download</a>
+            </Button>
+            <Button onClick={props.handleData} color="secondary" variant="contained" endIcon={<TroubleshootIcon />}>
+              {'Anaylze'}
+            </Button>
+          </Stack>
+          <Stack sx={{paddingRight: '1%', paddingTop: '10px'}} direction={'row'} spacing={{ xs: 1, sm: 2, md: 4 }}>
+            <Button color="primary" variant="contained" endIcon={<PlaceIcon />}>
+              {formatTime(currentTime)}
+            </Button>
+            <Button color="primary" variant="contained" endIcon={<AccessTimeIcon />}>
+              {duration}
+            </Button>
+          </Stack>
+        </Stack>
       }
-      <p>Seconds played: {formatTime(currentTime)}</p>
     </>
   )
 }

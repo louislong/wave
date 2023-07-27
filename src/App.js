@@ -6,6 +6,9 @@ import RegionsPlugin from "wavesurfer.js/dist/plugins/regions";
 
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
 import StopRoundedIcon from '@mui/icons-material/StopRounded';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { green, purple } from '@mui/material/colors';
+
 
 // import Crunker from 'crunker'
 
@@ -54,6 +57,23 @@ function getPCM(willConvert, blob, counter) {
     fileReader.readAsArrayBuffer(blob);
   });
 }
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      light: purple[300],
+      main: purple[500],
+      dark: purple[700],
+      contrastText: '#fff',
+    },
+    secondary: {
+      light: green[300],
+      main: green[500],
+      dark: green[700],
+      contrastText: '#fff',
+    },
+  },
+});
 
 const App = () => {
   const [pcm, setPcm] = useState();
@@ -135,54 +155,56 @@ const App = () => {
     });
   }
   return (
-    <Box sx={{ flexGrow: 1, backgroundColor: 'lightblue' }}>
-      <Grid direction="column" justifyContent="center" alignItems="center" container spacing={2} sx={{ height: '100vh', width: '100vw'}}>
-        <Grid item sx={{ display: 'flex' }} xs={10} justifyContent="center" alignItems="center">
-          <Container disableGutters sx={{width: '100vw'}}>
-          {
-            state === 'recording' && pcm && <Waveform pcm={pcm} />
-          }
-          {
-            state !== 'recording' &&
-            <WaveSurferPlayer
-              height={100}
-              waveColor="#ff4e00"
-              progressColor="#dd5e98"
-              cursorColor='#ddd5e9'
-              cursorWidth={1}
-              url={audioUrl}
-              wavUrl={wavUrl}
-              minPxPerSec={1} /** Minimum pixels per second of audio (i.e. zoom level) */
-              wsRegions={wsRegions}
-              interact={true}
-              handleData={handleData}
-              plugins={[
-                wsRegions,
-                TimelinePlugin.create(),
-                MinimapPlugin.create({
-                  height: 20,
-                  waveColor: '#ddd',
-                  progressColor: '#999',
-                  // the Minimap takes all the same options as the WaveSurfer itself
-                }),
-              ]}
-            />
-          }
-          </Container>
+    <ThemeProvider theme={theme}>
+       <Box sx={{ flexGrow: 1, backgroundColor: 'lightblue' }}>
+        <Grid direction="column" justifyContent="center" alignItems="center" container spacing={2} sx={{ height: '100vh', width: '100vw'}}>
+          <Grid item sx={{ display: 'flex' }} xs={10} justifyContent="center" alignItems="center">
+            <Container disableGutters sx={{width: '100vw'}}>
+            {
+              state === 'recording' && pcm && <Waveform pcm={pcm} />
+            }
+            {
+              state !== 'recording' &&
+              <WaveSurferPlayer
+                height={160}
+                waveColor="darkblue"
+                progressColor="#dd5e98"
+                // cursorColor='#ddd5e9'
+                cursorWidth={1}
+                url={audioUrl}
+                wavUrl={wavUrl}
+                minPxPerSec={1} /** Minimum pixels per second of audio (i.e. zoom level) */
+                wsRegions={wsRegions}
+                interact={true}
+                handleData={handleData}
+                plugins={[
+                  wsRegions,
+                  TimelinePlugin.create(),
+                  MinimapPlugin.create({
+                    height: 20,
+                    waveColor: '#ddd',
+                    progressColor: '#999',
+                    // the Minimap takes all the same options as the WaveSurfer itself
+                  }),
+                ]}
+              />
+            }
+            </Container>
+          </Grid>
+          <Grid item xs={2}>
+            {
+              state === 'inactive' ?
+              <IconButton onClick={() => start(TIME_SLICES)} >
+                <KeyboardVoiceIcon sx={{ fontSize: 30, borderRadius: '100px', padding: '20px', backgroundColor: '#f03', color: 'white' }} />
+              </IconButton> :
+              <IconButton onClick={() => stop()}>
+                <StopRoundedIcon sx={{ fontSize: 30, borderRadius: '100px', padding: '20px', backgroundColor: '#f03', color: 'white' }} />
+              </IconButton>
+            }
+          </Grid>
         </Grid>
-        <Grid item xs={2}>
-          {
-            state === 'inactive' ?
-            <IconButton onClick={() => start(TIME_SLICES)} >
-              <KeyboardVoiceIcon sx={{ fontSize: 30, borderRadius: '100px', padding: '20px', backgroundColor: '#f03', color: 'white' }} />
-            </IconButton> :
-            <IconButton onClick={() => stop()}>
-              <StopRoundedIcon sx={{ fontSize: 30, borderRadius: '100px', padding: '20px', backgroundColor: '#f03', color: 'white' }} />
-            </IconButton>
-          }
-        </Grid>
-      </Grid>
-    </Box>
+      </Box>
+    </ThemeProvider>
   );
 };
 export default App;
