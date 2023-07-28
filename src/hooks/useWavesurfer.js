@@ -5,7 +5,7 @@ import SpectrogramPlugin from "wavesurfer.js/dist/plugins/spectrogram";
 import colormap from "colormap";
 
 const colors = colormap({
-  colormap: 'winter',  // https://www.npmjs.com/package/colormap
+  colormap: 'cool',  // https://www.npmjs.com/package/colormap
   nshades: 256,
   format: 'float'
 });
@@ -28,9 +28,9 @@ const useWavesurfer = (containerRef, spectrogramRef, options) => {
       SpectrogramPlugin.create({
         container: spectrogramRef.current,
         labels: true,
-        height: 180,
+        height: 120,
         frequencyMin: 0,
-        // frequencyMax: 625,
+        frequencyMax: 586,
         colorMap: colors,
       }),
     )

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import './App.css';
 import MinimapPlugin from 'wavesurfer.js/dist/plugins/minimap';
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline';
@@ -43,13 +43,14 @@ function getPCM(willConvert, blob, counter) {
           // get 5 seconds pcm data
           const pcm = audioBuffer.getChannelData(0);
 
-          const threshold = WAVEFORM_DURATION / TIME_SLICES
-          if (counter > 25) {
-            const start = Math.floor((counter - threshold) / counter * pcm.length)
-            resolve(pcm.slice(start))
-          } else {
-            resolve(pcm);
-          }
+          // const threshold = WAVEFORM_DURATION / TIME_SLICES
+          // if (counter > 25) {
+          //   const start = Math.floor((counter - threshold) / counter * pcm.length)
+          //   resolve(pcm.slice(start))
+          // } else {
+          //   resolve(pcm);
+          // }
+          resolve(pcm)
         }
       }, err => reject(err));
     };
@@ -80,7 +81,8 @@ const App = () => {
   const [audioUrl, setAudioUrl] = useState();
   const [wavUrl, setWavUrl] = useState();
   const [wavBlob, setWavBlob] = useState();
-
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [anaylzeResult, setAnalyzeResult] = useState()
   // Create a Regions plugin instance
   const wsRegions = RegionsPlugin.create();
 
@@ -89,6 +91,7 @@ const App = () => {
     onStart: () => {
       setPcm(undefined)
       setAudioUrl(undefined)
+      setAnalyzeResult(undefined)
     },
     onStop: async (audioChunks, type) => {
 
@@ -130,14 +133,19 @@ const App = () => {
       setPcm(await getPCM(false, audioBlob, counter));
     },
   });
+  // useEffect(() => {
+  //   start(TIME_SLICES)
+  // }, [])
 
-  const handleData = () => {
+  const handleData = useCallback(() => {
     const formData = new FormData();
     const file = new File([wavBlob], 'test.wav')
 
     formData.append('file', file);
+    setAnalyzeResult(undefined)
+    setIsAnalyzing(true)
 
-    fetch('http://3.135.20.213/StethyAPI', {
+    fetch('https://stethy.pdi.lab126.a2z.com/StethyAPI', {
       method: 'POST',
       headers: {
         // 'Content-Type': 'multipart/form-data',
@@ -146,14 +154,19 @@ const App = () => {
       },
       body: formData
     })
-    .then((response) => response.json())
+    .then((response) => response.text())
     .then((result) => {
+      setIsAnalyzing(false)
+      setAnalyzeResult(result)
       console.log('Success:', result);
     })
     .catch((error) => {
+      setIsAnalyzing(false)
+      setAnalyzeResult(error)
       console.error('Error:', error);
     });
-  }
+  }, [wavBlob])
+
   return (
     <ThemeProvider theme={theme}>
        <Box sx={{ flexGrow: 1, backgroundColor: 'lightblue' }}>
@@ -166,9 +179,10 @@ const App = () => {
             {
               state !== 'recording' &&
               <WaveSurferPlayer
-                height={160}
+                height={200}
+                barHeight={5}
                 waveColor="darkblue"
-                progressColor="#dd5e98"
+                progressColor="#ff4e00"
                 // cursorColor='#ddd5e9'
                 cursorWidth={1}
                 url={audioUrl}
@@ -177,6 +191,8 @@ const App = () => {
                 wsRegions={wsRegions}
                 interact={true}
                 handleData={handleData}
+                isAnalyzing={isAnalyzing}
+                anaylzeResult={anaylzeResult}
                 plugins={[
                   wsRegions,
                   TimelinePlugin.create(),
@@ -194,7 +210,7 @@ const App = () => {
           <Grid item xs={2}>
             {
               state === 'inactive' ?
-              <IconButton onClick={() => start(TIME_SLICES)} >
+              <IconButton disabled={isAnalyzing} onClick={() => start(TIME_SLICES)} >
                 <KeyboardVoiceIcon sx={{ fontSize: 30, borderRadius: '100px', padding: '20px', backgroundColor: '#f03', color: 'white' }} />
               </IconButton> :
               <IconButton onClick={() => stop()}>

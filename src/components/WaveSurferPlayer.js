@@ -5,6 +5,12 @@ import DownloadIcon from '@mui/icons-material/Download';
 import TroubleshootIcon from '@mui/icons-material/Troubleshoot';
 import PlaceIcon from '@mui/icons-material/Place';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import LoadingButton from '@mui/lab/LoadingButton';
+import Slider from '@mui/material/Slider';
+import Chip from '@mui/material/Chip';
+import MoodIcon from '@mui/icons-material/Mood';
+import MoodBadIcon from '@mui/icons-material/MoodBad';
+import SentimentNeutralIcon from '@mui/icons-material/SentimentNeutral';
 
 import Button from '@mui/material/Button';
 import { Stack } from '@mui/material';
@@ -27,6 +33,7 @@ const WaveSurferPlayer = (props) => {
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState()
+  const [barHeight, setBarHeight] = useState(5)
 
   const wavesurfer = useWavesurfer(containerRef, spectrogramRef, props)
 
@@ -37,6 +44,25 @@ const WaveSurferPlayer = (props) => {
     // wavesurfer?.media.play()
     // wavesurfer.playPause()
   }, [wavesurfer, isPlaying])
+
+  const handleChange = useCallback((event, newValue) => {
+    setBarHeight(newValue);
+    wavesurfer.setOptions({
+      barHeight: newValue
+    })
+  }, [wavesurfer])
+
+  const getAnalyzeResultComponent = (result) => {
+    if (result === 'Abnormal Heart Rate') {
+      return <Chip icon={<MoodBadIcon />} label={result} color={'error'} variant="outlined" />
+    } else if (result === 'Normal Heart Rate') {
+      return <Chip icon={<MoodIcon />} label={result} color={'success'} variant="outlined" />
+    } else if (result === 'Cannot be determined') {
+      return <Chip icon={<SentimentNeutralIcon />} label={result} color={'info'} variant="outlined" />
+    } else {
+      return <Chip label={result} color={'error'} variant="outlined" />
+    }
+  }
 
   // Loop a region on click
   const loop = true
@@ -123,11 +149,15 @@ const WaveSurferPlayer = (props) => {
             <Button color="secondary" variant="contained" endIcon={<DownloadIcon />}>
               <a style={{textDecoration: 'none', color: 'white'}} href={props.wavUrl} download={'recording.wav'} >Download</a>
             </Button>
-            <Button onClick={props.handleData} color="secondary" variant="contained" endIcon={<TroubleshootIcon />}>
-              {'Anaylze'}
-            </Button>
+            <LoadingButton loadingPosition="end" loading={props.isAnalyzing} onClick={props.handleData} color="secondary" variant="contained" endIcon={<TroubleshootIcon />}>
+              {props.isAnalyzing ? 'Anaylzing' : 'Anaylze'}
+            </LoadingButton>
+            {
+              props.anaylzeResult && getAnalyzeResultComponent(props.anaylzeResult)
+            }
           </Stack>
           <Stack sx={{paddingRight: '1%', paddingTop: '10px'}} direction={'row'} spacing={{ xs: 1, sm: 2, md: 4 }}>
+            <Slider onChange={handleChange} value={barHeight} min={.1} max={10} step={0.01} aria-label="Default" valueLabelDisplay="off" />
             <Button color="primary" variant="contained" endIcon={<PlaceIcon />}>
               {formatTime(currentTime)}
             </Button>
