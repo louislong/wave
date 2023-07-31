@@ -54,14 +54,33 @@ const WaveSurferPlayer = (props) => {
   }, [wavesurfer])
 
   const getAnalyzeResultComponent = (result) => {
-    if (result?.includes('Abnormal Heart')) {
-      return <Chip icon={<MoodBadIcon />} label={result} color={'error'} variant="outlined" />
-    } else if (result?.includes('Normal Heart')) {
-      return <Chip icon={<MoodIcon />} label={result} color={'success'} variant="outlined" />
-    } else if (result?.includes('Cannot be determined')) {
-      return <Chip icon={<SentimentNeutralIcon />} label={result} color={'info'} variant="outlined" />
-    } else {
-      return <Chip label={result} color={'error'} variant="outlined" />
+    const resultArray = result?.split(',')
+    if (resultArray) {
+      if (result?.includes('Abnormal Heart')) {
+        return (
+          <Stack direction='row' spacing={{ xs: 1, sm: 2 }} sx={{paddingLeft: '1%', paddingTop: '1%'}}>
+            <Chip icon={<MoodBadIcon />} label={resultArray[0]} color={'error'} variant="outlined" />
+            <Chip label={` Heart Rate: ${resultArray[1]}`} color={'error'} variant="outlined" />
+          </Stack>
+        )
+      } else if (result?.includes('Normal Heart')) {
+        return (
+          <Stack direction='row' spacing={{ xs: 1, sm: 2 }} sx={{paddingLeft: '1%', paddingTop: '1%'}}>
+            <Chip icon={<MoodIcon />} label={resultArray[0]} color={'success'} variant="outlined" />
+            <Chip label={` Heart Rate: ${resultArray[1]}`} color={'success'} variant="outlined" />
+          </Stack>
+          
+        )
+      } else if (result?.includes('Cannot be determined')) {
+        return (
+          <Stack direction='row' spacing={{ xs: 1, sm: 2 }} sx={{paddingLeft: '1%', paddingTop: '1%'}}>
+            <Chip icon={<SentimentNeutralIcon />} label={resultArray[0]} color={'info'} variant="outlined" />
+            <Chip label={` Heart Rate: ${resultArray[1]}`} color={'info'} variant="outlined" />
+          </Stack>
+        )
+      } else {
+        return <Chip label={result} color={'error'} variant="outlined" sx={{paddingLeft: '1%'}}/>
+      }
     }
   }
 
@@ -163,9 +182,6 @@ const WaveSurferPlayer = (props) => {
             <LoadingButton loadingPosition="end" loading={props.isAnalyzing} onClick={props.handleData} color="secondary" variant="contained" endIcon={<TroubleshootIcon />}>
               {props.isAnalyzing ? 'Anaylzing' : 'Anaylze'}
             </LoadingButton>
-            {
-              props.anaylzeResult && getAnalyzeResultComponent(props.anaylzeResult)
-            }
           </Stack>
           <Stack sx={{paddingRight: '1%', paddingTop: '10px'}} direction={'row'} spacing={{ xs: 1, sm: 2, md: 4 }}>
             <Slider onChange={handleChange} value={barHeight} min={.1} max={10} step={0.01} aria-label="Default" valueLabelDisplay="off" />
@@ -177,6 +193,9 @@ const WaveSurferPlayer = (props) => {
             </Button>
           </Stack>
         </Stack>
+      }
+      {
+        props.anaylzeResult && getAnalyzeResultComponent(props.anaylzeResult)
       }
     </>
   )
