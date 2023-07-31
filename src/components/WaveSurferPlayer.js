@@ -53,9 +53,9 @@ const WaveSurferPlayer = (props) => {
   }, [wavesurfer])
 
   const getAnalyzeResultComponent = (result) => {
-    if (result === 'Abnormal Heart Rate') {
+    if (result === 'Abnormal Heart') {
       return <Chip icon={<MoodBadIcon />} label={result} color={'error'} variant="outlined" />
-    } else if (result === 'Normal Heart Rate') {
+    } else if (result === 'Normal Heart') {
       return <Chip icon={<MoodIcon />} label={result} color={'success'} variant="outlined" />
     } else if (result === 'Cannot be determined') {
       return <Chip icon={<SentimentNeutralIcon />} label={result} color={'info'} variant="outlined" />
