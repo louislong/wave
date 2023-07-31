@@ -177,7 +177,7 @@ const App = () => {
        <Box sx={{ flexGrow: 1, backgroundColor: 'lightblue' }}>
         <Grid direction="column" justifyContent="center" alignItems="center" container spacing={2} sx={{ height: '100vh', width: '100vw', marginTop: 0}}>
           <Grid item sx={{ display: 'flex', alignItems: 'center', }} xs={1}>
-            <img alt="logo" style={{width: 120, height: 40}} src={logo} />
+            <img alt="logo" style={{width: 114, height: 38}} src={logo} />
             <Typography
               variant={'h3'}
               sx={{color: "#e47911",}}
@@ -188,10 +188,14 @@ const App = () => {
           <Grid item sx={{ display: 'flex' }} xs={7} justifyContent="center" alignItems="center">
             <Container disableGutters sx={{width: '100vw'}}>
             {
+              state !== 'recording' && !audioUrl &&
+              <Typography variant="body1" sx={{textAlign: 'justify', paddingInline: '2%'}}>Disclaimer  : Stethy's prototype presented here is for demonstration purposes only and should not be considered a medical device at this stage of development. Hence, it is not intended for diagnosis, treatment, or monitoring of medical conditions. For any health concerns or medical advice, please consult a qualified healthcare professional. The data displayed on the screen is simulated and may or may not represent actual patient data. The creators assume no liability for any misuse or reliance on the information provided.</Typography>
+            }
+            {
               state === 'recording' && pcm && <Waveform pcm={pcm} />
             }
             {
-              state !== 'recording' &&
+              state !== 'recording' && audioUrl &&
               <WaveSurferPlayer
                 height={200}
                 barHeight={3}
@@ -221,7 +225,7 @@ const App = () => {
             }
             </Container>
           </Grid>
-          <Grid item xs={1.5}>
+          <Grid item xs={2}>
             {
               state === 'inactive' ?
               <IconButton disabled={isAnalyzing} onClick={() => startRecording()} >
@@ -232,11 +236,6 @@ const App = () => {
                 <Typography sx={{paddingLeft: '10px', paddingRight: '5px', color: 'white'}} variant="body1">{formatTime(now.current)}</Typography>
               </IconButton>
             }
-          </Grid>
-          <Grid item xs={1.5}>
-            <Container disableGutters sx={{width: '100vw', paddingInline: '5px'}}>
-              <Typography variant="body1">Disclaimer  : Stethy's prototype presented here is for demonstration purposes only and should not be considered a medical device at this stage of development. Hence, it is not intended for diagnosis, treatment, or monitoring of medical conditions. For any health concerns or medical advice, please consult a qualified healthcare professional. The data displayed on the screen is simulated and may or may not represent actual patient data. The creators assume no liability for any misuse or reliance on the information provided.</Typography>
-            </Container>
           </Grid>
         </Grid>
       </Box>
