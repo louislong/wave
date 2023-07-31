@@ -6,7 +6,7 @@ import RegionsPlugin from "wavesurfer.js/dist/plugins/regions";
 
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
 import StopRoundedIcon from '@mui/icons-material/StopRounded';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider, createTheme, responsiveFontSizes } from '@mui/material/styles';
 import { green, purple } from '@mui/material/colors';
 import Typography from '@mui/material/Typography';
 
@@ -20,6 +20,7 @@ import IconButton from '@mui/material/IconButton';
 import { useMediaRecorder } from './hooks/useMediaRecorder';
 import { Waveform, WaveSurferPlayer } from './components';
 import audioBufferToWav from './util/bufferToWav';
+import logo from "./util/amazon-logo-1.png"
 
 const TIME_SLICES = 200; // in miliseconds
 const WAVEFORM_DURATION = 5000; // 5 seconds
@@ -67,7 +68,7 @@ function getPCM(willConvert, blob, counter) {
   });
 }
 
-const theme = createTheme({
+const theme = responsiveFontSizes(createTheme({
   palette: {
     primary: {
       light: purple[300],
@@ -82,7 +83,7 @@ const theme = createTheme({
       contrastText: '#fff',
     },
   },
-});
+}));
 
 const App = () => {
   const [pcm, setPcm] = useState();
@@ -175,7 +176,16 @@ const App = () => {
     <ThemeProvider theme={theme}>
        <Box sx={{ flexGrow: 1, backgroundColor: 'lightblue' }}>
         <Grid direction="column" justifyContent="center" alignItems="center" container spacing={2} sx={{ height: '100vh', width: '100vw', marginTop: 0}}>
-          <Grid item sx={{ display: 'flex' }} xs={8} justifyContent="center" alignItems="center">
+          <Grid item sx={{ display: 'flex', alignItems: 'center', }} xs={1}>
+            <img alt="logo" style={{width: 120, height: 40}} src={logo} />
+            <Typography
+              variant={'h3'}
+              sx={{color: "#e47911",}}
+            >
+              Stethy
+            </Typography>
+          </Grid>
+          <Grid item sx={{ display: 'flex' }} xs={7} justifyContent="center" alignItems="center">
             <Container disableGutters sx={{width: '100vw'}}>
             {
               state === 'recording' && pcm && <Waveform pcm={pcm} />
@@ -186,7 +196,7 @@ const App = () => {
                 height={200}
                 barHeight={3}
                 waveColor="darkblue"
-                progressColor="#ff4e00"
+                progressColor="#e47911"
                 cursorColor='#fff'
                 cursorWidth={1}
                 url={audioUrl}
@@ -215,10 +225,10 @@ const App = () => {
             {
               state === 'inactive' ?
               <IconButton disabled={isAnalyzing} onClick={() => startRecording()} >
-                <KeyboardVoiceIcon sx={{ fontSize: 30, borderRadius: '100px', padding: '20px', backgroundColor: '#f03', color: 'white' }} />
+                <KeyboardVoiceIcon sx={{ fontSize: 30, borderRadius: '100px', padding: '20px', backgroundColor: '#e47911', color: 'white' }} />
               </IconButton> :
               <IconButton sx={{borderRadius: '35px', backgroundColor: 'rgba(0, 0, 0, 0.3)'}} onClick={() => stopRecording()}>
-                <StopRoundedIcon sx={{ fontSize: 18, borderRadius: '90px', padding: '20px', backgroundColor: '#f03', color: 'white' }} />
+                <StopRoundedIcon sx={{ fontSize: 18, borderRadius: '90px', padding: '20px', backgroundColor: '#e47911', color: 'white' }} />
                 <Typography sx={{paddingLeft: '10px', paddingRight: '5px', color: 'white'}} variant="body1">{formatTime(now.current)}</Typography>
               </IconButton>
             }
