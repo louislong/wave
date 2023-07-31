@@ -131,6 +131,7 @@ const App = () => {
     setIsAnalyzing(true)
 
     fetch('https://stethy.pdi.lab126.a2z.com/StethyAPI', {
+    // fetch('http://3.135.20.213/StethyAPI', {
       method: 'POST',
       headers: {
         // 'Content-Type': 'multipart/form-data',
@@ -174,7 +175,7 @@ const App = () => {
     <ThemeProvider theme={theme}>
        <Box sx={{ flexGrow: 1, backgroundColor: 'lightblue' }}>
         <Grid direction="column" justifyContent="center" alignItems="center" container spacing={2} sx={{ height: '100vh', width: '100vw', marginTop: 0}}>
-          <Grid item sx={{ display: 'flex' }} xs={10} justifyContent="center" alignItems="center">
+          <Grid item sx={{ display: 'flex' }} xs={8} justifyContent="center" alignItems="center">
             <Container disableGutters sx={{width: '100vw'}}>
             {
               state === 'recording' && pcm && <Waveform pcm={pcm} />
@@ -183,7 +184,7 @@ const App = () => {
               state !== 'recording' &&
               <WaveSurferPlayer
                 height={200}
-                barHeight={5}
+                barHeight={3}
                 waveColor="darkblue"
                 progressColor="#ff4e00"
                 cursorColor='#fff'
@@ -210,7 +211,7 @@ const App = () => {
             }
             </Container>
           </Grid>
-          <Grid item xs={2}>
+          <Grid item xs={1.5}>
             {
               state === 'inactive' ?
               <IconButton disabled={isAnalyzing} onClick={() => startRecording()} >
@@ -222,8 +223,12 @@ const App = () => {
               </IconButton>
             }
           </Grid>
+          <Grid item xs={1.5}>
+            <Container disableGutters sx={{width: '100vw', paddingInline: '5px'}}>
+              <Typography variant="body1">Disclaimer  : Stethy's prototype presented here is for demonstration purposes only and should not be considered a medical device at this stage of development. Hence, it is not intended for diagnosis, treatment, or monitoring of medical conditions. For any health concerns or medical advice, please consult a qualified healthcare professional. The data displayed on the screen is simulated and may or may not represent actual patient data. The creators assume no liability for any misuse or reliance on the information provided.</Typography>
+            </Container>
+          </Grid>
         </Grid>
-        <Typography sx={{position: 'absolute', bottom: '2%', right: '5%'}} variant="body1">Disclaimer text</Typography>
       </Box>
     </ThemeProvider>
   );

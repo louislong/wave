@@ -10,6 +10,7 @@ import Slider from '@mui/material/Slider';
 import Chip from '@mui/material/Chip';
 import MoodIcon from '@mui/icons-material/Mood';
 import MoodBadIcon from '@mui/icons-material/MoodBad';
+import SendIcon from '@mui/icons-material/Send';
 import SentimentNeutralIcon from '@mui/icons-material/SentimentNeutral';
 
 import Button from '@mui/material/Button';
@@ -33,7 +34,7 @@ const WaveSurferPlayer = (props) => {
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState()
-  const [barHeight, setBarHeight] = useState(5)
+  const [barHeight, setBarHeight] = useState(3)
 
   const wavesurfer = useWavesurfer(containerRef, spectrogramRef, props)
 
@@ -73,6 +74,13 @@ const WaveSurferPlayer = (props) => {
     activeRegionRef.current = region
     region.play()
     region.setOptions({ color: 'rgba(223, 223,112, 0.5)' })
+  })
+
+  wsRegions.on('region-dblclicked', (region, e) => {
+    e.stopPropagation() // prevent triggering a click on the waveform
+    activeRegionRef.current = region
+    region.stop()
+    region.setOptions({ color: 'rgba(123,23,200, 0.5)' })
   })
 
   // Initialize wavesurfer when the container mounts
@@ -116,7 +124,7 @@ const WaveSurferPlayer = (props) => {
           start: 2,
           end: 4,
           content: 'Region',
-          resize: false,
+          resize: true,
           color: 'rgba(123,23,200, 0.5)',
         })
         // wsRegions.addRegion({
@@ -148,6 +156,9 @@ const WaveSurferPlayer = (props) => {
             </Button>
             <Button color="secondary" variant="contained" endIcon={<DownloadIcon />}>
               <a style={{textDecoration: 'none', color: 'white'}} href={props.wavUrl} download={'recording.wav'} >Download</a>
+            </Button>
+            <Button color="secondary" variant="contained" endIcon={<SendIcon />}>
+              {'Share'}
             </Button>
             <LoadingButton loadingPosition="end" loading={props.isAnalyzing} onClick={props.handleData} color="secondary" variant="contained" endIcon={<TroubleshootIcon />}>
               {props.isAnalyzing ? 'Anaylzing' : 'Anaylze'}
