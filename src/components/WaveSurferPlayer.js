@@ -11,10 +11,13 @@ import Chip from '@mui/material/Chip';
 import MoodIcon from '@mui/icons-material/Mood';
 import MoodBadIcon from '@mui/icons-material/MoodBad';
 import SendIcon from '@mui/icons-material/Send';
+// import Typography from '@mui/material/Typography';
 import SentimentNeutralIcon from '@mui/icons-material/SentimentNeutral';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 import Button from '@mui/material/Button';
 import { Stack } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 import useWavesurfer from '../hooks/useWavesurfer';
 
@@ -37,6 +40,10 @@ const WaveSurferPlayer = (props) => {
   const [barHeight, setBarHeight] = useState(3)
 
   const wavesurfer = useWavesurfer(containerRef, spectrogramRef, props)
+
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));  // screen width < 600
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg')); // screen width > 1200
 
   // On play button click
   const onPlayClick = useCallback(() => {
@@ -139,13 +146,13 @@ const WaveSurferPlayer = (props) => {
         setDuration(formatTime(duration))
         // setCurrentTime(0)
         // setIsPlaying(false)
-        wsRegions.addRegion({
-          start: 2,
-          end: 4,
-          content: 'Region',
-          resize: true,
-          color: 'rgba(123,23,200, 0.5)',
-        })
+        // wsRegions.addRegion({
+        //   start: 2,
+        //   end: 4,
+        //   content: 'Region',
+        //   resize: true,
+        //   color: 'rgba(123,23,200, 0.5)',
+        // })
         // wsRegions.addRegion({
         //   start: 5,
         //   content: 'Marker',
@@ -164,31 +171,31 @@ const WaveSurferPlayer = (props) => {
 
   return (
     <>
-      <div ref={containerRef} style={{ minHeight: '120px', paddingInline: '1%',}} />
+      <div ref={containerRef} style={{ minHeight: '120px', paddingInline: '1%'}} />
       <div ref={spectrogramRef} style={{margin: '10px auto', position: 'relative', paddingInline: '1%'}} />
       {
         props.wavUrl && 
         <Stack justifyContent="space-between" direction={{ xs: 'column', sm: 'row' }}>
           <Stack sx={{paddingLeft: '1%', paddingTop: '10px'}} direction={'row'} spacing={{ xs: 1, sm: 2, md: 4 }}>
-            <Button color="secondary" onClick={onPlayClick} variant="contained" endIcon={isPlaying ? <PauseIcon /> : <PlayArrowIcon />}>
+            <Button size={isLargeScreen ? 'medium' : 'small'} color="secondary" onClick={onPlayClick} variant="contained" endIcon={isPlaying ? <PauseIcon /> : <PlayArrowIcon />}>
               {isPlaying ? 'Pause' : 'Play'}
             </Button>
-            <Button color="secondary" variant="contained" endIcon={<DownloadIcon />}>
+            <Button size={isLargeScreen ? 'medium' : 'small'} color="secondary" variant="contained" endIcon={<DownloadIcon />}>
               <a style={{textDecoration: 'none', color: 'white'}} href={props.wavUrl} download={'recording.wav'} >Download</a>
             </Button>
-            <Button color="secondary" variant="contained" endIcon={<SendIcon />}>
+            <Button size={isLargeScreen ? 'medium' : 'small'} color="secondary" variant="contained" endIcon={<SendIcon />}>
               {'Share'}
             </Button>
-            <LoadingButton loadingPosition="end" loading={props.isAnalyzing} onClick={props.handleData} color="secondary" variant="contained" endIcon={<TroubleshootIcon />}>
+            <LoadingButton size={isLargeScreen ? 'medium' : 'small'} loadingPosition="end" loading={props.isAnalyzing} onClick={props.handleData} color="secondary" variant="contained" endIcon={<TroubleshootIcon />}>
               {props.isAnalyzing ? 'Anaylzing' : 'Anaylze'}
             </LoadingButton>
           </Stack>
           <Stack sx={{paddingRight: '1%', paddingTop: '10px'}} direction={'row'} spacing={{ xs: 1, sm: 2, md: 4 }}>
-            <Slider onChange={handleChange} value={barHeight} min={.1} max={10} step={0.01} aria-label="Default" valueLabelDisplay="off" />
-            <Button color="primary" variant="contained" endIcon={<PlaceIcon />}>
+            <Slider sx={{width: '80px'}} onChange={handleChange} value={barHeight} min={.1} max={10} step={0.01} aria-label="Default" valueLabelDisplay="off" />
+            <Button size={isLargeScreen ? 'medium' : 'small'} color="primary" variant="contained" endIcon={<PlaceIcon />}>
               {formatTime(currentTime)}
             </Button>
-            <Button color="primary" variant="contained" endIcon={<AccessTimeIcon />}>
+            <Button size={isLargeScreen ? 'medium' : 'small'} color="primary" variant="contained" endIcon={<AccessTimeIcon />}>
               {duration}
             </Button>
           </Stack>

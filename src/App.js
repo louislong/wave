@@ -7,6 +7,7 @@ import RegionsPlugin from "wavesurfer.js/dist/plugins/regions";
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
 import StopRoundedIcon from '@mui/icons-material/StopRounded';
 import { ThemeProvider, createTheme, responsiveFontSizes } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { green, purple } from '@mui/material/colors';
 import Typography from '@mui/material/Typography';
 
@@ -20,7 +21,7 @@ import IconButton from '@mui/material/IconButton';
 import { useMediaRecorder } from './hooks/useMediaRecorder';
 import { Waveform, WaveSurferPlayer } from './components';
 import audioBufferToWav from './util/bufferToWav';
-import logo from "./util/amazon-logo-1.png"
+import logo from "./util/Logo_with_Tagline.png"
 
 const TIME_SLICES = 200; // in miliseconds
 const WAVEFORM_DURATION = 5000; // 5 seconds
@@ -95,6 +96,10 @@ const App = () => {
   // const [now, setNow] = useState(0)
   const now = useRef(0); // this will contain the recorded chunks
   const timer = useRef();
+
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg')); // screen width > 1200
+  console.warn('ismobile', isMobile)
 
   // Create a Regions plugin instance
   const wsRegions = RegionsPlugin.create();
@@ -174,30 +179,23 @@ const App = () => {
 
   return (
     <ThemeProvider theme={theme}>
-       <Box sx={{ flexGrow: 1, backgroundColor: 'lightblue' }}>
-        <Grid direction="column" justifyContent="center" alignItems="center" container spacing={2} sx={{ height: '100vh', width: '100vw', marginTop: 0}}>
-          <Grid item sx={{ display: 'flex', alignItems: 'center', }} xs={1}>
-            <img alt="logo" style={{width: 114, height: 38}} src={logo} />
-            <Typography
-              variant={'h3'}
-              sx={{color: "#e47911",}}
-            >
-              Stethy
-            </Typography>
+       <Box sx={{ flex: 1, backgroundColor: 'lightgray'}}>
+        <Grid direction="column" alignItems="center" container spacing={{xs: 1, sm: 1, md: 1, lg: 2}} sx={{width: '100vw', marginTop: 0, height: '100vh'}}>
+          <Grid item sx={{ display: 'flex', alignItems: 'center'}} xs={1}>
+            <img alt="logo" style={isLargeScreen ? {width: 406, height: 88} : {width: 304.5, height: 66}} src={logo} />
           </Grid>
           <Grid item sx={{ display: 'flex' }} xs={7} justifyContent="center" alignItems="center">
             <Container disableGutters sx={{width: '100vw'}}>
             {
-              state !== 'recording' && !audioUrl &&
-              <Typography variant="body1" sx={{textAlign: 'justify', paddingInline: '2%'}}>Disclaimer  : Stethy's prototype presented here is for demonstration purposes only and should not be considered a medical device at this stage of development. Hence, it is not intended for diagnosis, treatment, or monitoring of medical conditions. For any health concerns or medical advice, please consult a qualified healthcare professional. The data displayed on the screen is simulated and may or may not represent actual patient data. The creators assume no liability for any misuse or reliance on the information provided.</Typography>
+              state === 'recording' && pcm && <Waveform pcm={pcm} />
             }
             {
-              state === 'recording' && pcm && <Waveform pcm={pcm} />
+              state !== 'recording' && !audioUrl && <div style={{height: '50vh'}}/>
             }
             {
               state !== 'recording' && audioUrl &&
               <WaveSurferPlayer
-                height={200}
+                height={isLargeScreen ? 200 : 160}
                 barHeight={3}
                 waveColor="darkblue"
                 progressColor="#e47911"
@@ -225,17 +223,22 @@ const App = () => {
             }
             </Container>
           </Grid>
-          <Grid item xs={2}>
+          <Grid item xs={1}>
             {
               state === 'inactive' ?
               <IconButton disabled={isAnalyzing} onClick={() => startRecording()} >
-                <KeyboardVoiceIcon sx={{ fontSize: 30, borderRadius: '100px', padding: '20px', backgroundColor: '#e47911', color: 'white' }} />
+                <KeyboardVoiceIcon sx={{ fontSize: isLargeScreen ? 30 : 25, borderRadius: '100px', padding: '20px', backgroundColor: '#e47911', color: 'white' }} />
               </IconButton> :
               <IconButton sx={{borderRadius: '35px', backgroundColor: 'rgba(0, 0, 0, 0.3)'}} onClick={() => stopRecording()}>
                 <StopRoundedIcon sx={{ fontSize: 18, borderRadius: '90px', padding: '20px', backgroundColor: '#e47911', color: 'white' }} />
                 <Typography sx={{paddingLeft: '10px', paddingRight: '5px', color: 'white'}} variant="body1">{formatTime(now.current)}</Typography>
               </IconButton>
             }
+          </Grid>
+          <Grid item xs={2}>
+            <Container disableGutters sx={{width: '100vw', paddingInline: '3%', marginBottom: '5px'}}>
+              <Typography variant={isLargeScreen ? 'body2' : 'caption'} sx={{textAlign: 'justify', }}>Disclaimer: Stethy's prototype presented here is for demonstration purposes only and should not be considered a medical device at this stage of development. Hence, it is not intended for diagnosis, treatment, or monitoring of medical conditions. For any health concerns or medical advice, please consult a qualified healthcare professional. No data from the stethoscope or any user inputs will be stored or collected. The data displayed on the screen is simulated and may or may not represent actual patient data. The prototype operates in a stateless manner, and any data generated will be automatically deleted right after the page is refreshed. Please be assured that your privacy is our priority and the creators assume no liability for the handling of data in third-party applications beyond this demo or for any misuse or reliance on the information provided.</Typography>
+            </Container>
           </Grid>
         </Grid>
       </Box>
