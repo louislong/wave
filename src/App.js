@@ -179,18 +179,18 @@ const App = () => {
 
   return (
     <ThemeProvider theme={theme}>
-       <Box sx={{ flex: 1, backgroundColor: 'lightgray'}}>
-        <Grid direction="column" alignItems="center" container spacing={{xs: 1, sm: 1, md: 1, lg: 2}} sx={{width: '100vw', marginTop: 0, height: '100vh'}}>
-          <Grid item sx={{ display: 'flex', alignItems: 'center'}} xs={1}>
+       <Box sx={{ flex: 1, backgroundColor: 'lightgray', flexWrap: 'wrap'}}>
+        <Grid direction="column" alignItems="center" justifyContent={'center'} container spacing={2} sx={{width: '100vw', marginTop: 0}}>
+          <Grid item sx={{ display: 'flex', alignItems: 'center', minHeight: '20vh'}} xs={1.5}>
             <img alt="logo" style={isLargeScreen ? {width: 406, height: 88} : {width: 304.5, height: 66}} src={logo} />
           </Grid>
           <Grid item sx={{ display: 'flex' }} xs={7} justifyContent="center" alignItems="center">
-            <Container disableGutters sx={{width: '100vw'}}>
+            <Container disableGutters sx={{width: '100vw', minHeight: '50vh'}}>
             {
               state === 'recording' && pcm && <Waveform pcm={pcm} />
             }
             {
-              state !== 'recording' && !audioUrl && <div style={{height: '50vh'}}/>
+              state !== 'recording' && !audioUrl && <div style={{minHeight: '50vh'}}/>
             }
             {
               state !== 'recording' && audioUrl &&
@@ -223,7 +223,7 @@ const App = () => {
             }
             </Container>
           </Grid>
-          <Grid item xs={1}>
+          <Grid item xs={1} sx={{minHeight: '15vh' }}>
             {
               state === 'inactive' ?
               <IconButton disabled={isAnalyzing} onClick={() => startRecording()} >
@@ -235,8 +235,8 @@ const App = () => {
               </IconButton>
             }
           </Grid>
-          <Grid item xs={2}>
-            <Container disableGutters sx={{width: '100vw', paddingInline: '3%', marginBottom: '5px'}}>
+          <Grid sx={{ display: 'flex', minHeight: '15vh' }} item xs={1.5}>
+            <Container disableGutters sx={{width: '100vw', paddingInline: '3%', marginBottom: '10px'}}>
               <Typography variant={isLargeScreen ? 'body2' : 'caption'} sx={{textAlign: 'justify', }}>Disclaimer: Stethy's prototype presented here is for demonstration purposes only and should not be considered a medical device at this stage of development. Hence, it is not intended for diagnosis, treatment, or monitoring of medical conditions. For any health concerns or medical advice, please consult a qualified healthcare professional. No data from the stethoscope or any user inputs will be stored or collected. The data displayed on the screen is simulated and may or may not represent actual patient data. The prototype operates in a stateless manner, and any data generated will be automatically deleted right after the page is refreshed. Please be assured that your privacy is our priority and the creators assume no liability for the handling of data in third-party applications beyond this demo or for any misuse or reliance on the information provided.</Typography>
             </Container>
           </Grid>

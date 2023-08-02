@@ -65,14 +65,14 @@ const WaveSurferPlayer = (props) => {
     if (resultArray) {
       if (result?.includes('Abnormal Heart')) {
         return (
-          <Stack direction='row' spacing={{ xs: 1, sm: 2 }} sx={{paddingLeft: '1%', paddingTop: '1%'}}>
+          <Stack direction='row' spacing={{ xs: 1, sm: 2 }} sx={{paddingLeft: '1%', paddingTop: '15px'}}>
             <Chip icon={<MoodBadIcon />} label={resultArray[0]} color={'error'} variant="outlined" />
             <Chip label={` Heart Rate: ${resultArray[1]}`} color={'error'} variant="outlined" />
           </Stack>
         )
       } else if (result?.includes('Normal Heart')) {
         return (
-          <Stack direction='row' spacing={{ xs: 1, sm: 2 }} sx={{paddingLeft: '1%', paddingTop: '1%'}}>
+          <Stack direction='row' spacing={{ xs: 1, sm: 2 }} sx={{paddingLeft: '1%', paddingTop: '15px'}}>
             <Chip icon={<MoodIcon />} label={resultArray[0]} color={'success'} variant="outlined" />
             <Chip label={` Heart Rate: ${resultArray[1]}`} color={'success'} variant="outlined" />
           </Stack>
@@ -80,13 +80,13 @@ const WaveSurferPlayer = (props) => {
         )
       } else if (result?.includes('Cannot be determined')) {
         return (
-          <Stack direction='row' spacing={{ xs: 1, sm: 2 }} sx={{paddingLeft: '1%', paddingTop: '1%'}}>
+          <Stack direction='row' spacing={{ xs: 1, sm: 2 }} sx={{paddingLeft: '1%', paddingTop: '15px'}}>
             <Chip icon={<SentimentNeutralIcon />} label={resultArray[0]} color={'info'} variant="outlined" />
             <Chip label={` Heart Rate: ${resultArray[1]}`} color={'info'} variant="outlined" />
           </Stack>
         )
       } else {
-        return <Chip label={result} color={'error'} variant="outlined" sx={{paddingLeft: '1%'}}/>
+        return <Chip label={result} color={'error'} variant="outlined" sx={{paddingLeft: '15px'}}/>
       }
     }
   }
