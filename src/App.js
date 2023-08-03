@@ -230,7 +230,7 @@ const App = () => {
                 <KeyboardVoiceIcon sx={{ fontSize: isLargeScreen ? 30 : 25, borderRadius: '100px', padding: '20px', backgroundColor: '#e47911', color: 'white' }} />
               </IconButton> :
               <IconButton sx={{borderRadius: '35px', backgroundColor: 'rgba(0, 0, 0, 0.3)'}} onClick={() => stopRecording()}>
-                <StopRoundedIcon sx={{ fontSize: 18, borderRadius: '90px', padding: '20px', backgroundColor: '#e47911', color: 'white' }} />
+                <StopRoundedIcon sx={{ fontSize: 20, borderRadius: '90px', padding: '20px', backgroundColor: '#e47911', color: 'white' }} />
                 <Typography sx={{paddingLeft: '10px', paddingRight: '5px', color: 'white'}} variant="body1">{formatTime(now.current)}</Typography>
               </IconButton>
             }

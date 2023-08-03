@@ -65,14 +65,14 @@ const WaveSurferPlayer = (props) => {
     if (resultArray) {
       if (result?.includes('Abnormal Heart')) {
         return (
-          <Stack direction='row' spacing={{ xs: 1, sm: 2 }} sx={{paddingLeft: '1%', paddingTop: '15px'}}>
+          <Stack direction='row' justifyContent="center" spacing={{ xs: 1, sm: 2 }} sx={{paddingLeft: '1%', paddingTop: '20px'}}>
             <Chip icon={<MoodBadIcon />} label={resultArray[0]} color={'error'} variant="outlined" />
             <Chip label={` Heart Rate: ${resultArray[1]}`} color={'error'} variant="outlined" />
           </Stack>
         )
       } else if (result?.includes('Normal Heart')) {
         return (
-          <Stack direction='row' spacing={{ xs: 1, sm: 2 }} sx={{paddingLeft: '1%', paddingTop: '15px'}}>
+          <Stack direction='row' justifyContent="center" spacing={{ xs: 1, sm: 2 }} sx={{paddingLeft: '1%', paddingTop: '20px'}}>
             <Chip icon={<MoodIcon />} label={resultArray[0]} color={'success'} variant="outlined" />
             <Chip label={` Heart Rate: ${resultArray[1]}`} color={'success'} variant="outlined" />
           </Stack>
@@ -80,7 +80,7 @@ const WaveSurferPlayer = (props) => {
         )
       } else if (result?.includes('Cannot be determined')) {
         return (
-          <Stack direction='row' spacing={{ xs: 1, sm: 2 }} sx={{paddingLeft: '1%', paddingTop: '15px'}}>
+          <Stack direction='row' justifyContent="center" spacing={{ xs: 1, sm: 2 }} sx={{paddingLeft: '1%', paddingTop: '20px'}}>
             <Chip icon={<SentimentNeutralIcon />} label={resultArray[0]} color={'info'} variant="outlined" />
             <Chip label={` Heart Rate: ${resultArray[1]}`} color={'info'} variant="outlined" />
           </Stack>
@@ -176,7 +176,7 @@ const WaveSurferPlayer = (props) => {
       {
         props.wavUrl && 
         <Stack justifyContent="space-between" direction={{ xs: 'column', sm: 'row' }}>
-          <Stack sx={{paddingLeft: '1%', paddingTop: '10px'}} direction={'row'} spacing={{ xs: 1, sm: 2, md: 4 }}>
+          <Stack sx={{paddingInline: '1%', paddingTop: '10px'}} direction={'row'} spacing={{ xs: 1, sm: 2, md: 4 }}>
             <Button size={isLargeScreen ? 'medium' : 'small'} color="secondary" onClick={onPlayClick} variant="contained" endIcon={isPlaying ? <PauseIcon /> : <PlayArrowIcon />}>
               {isPlaying ? 'Pause' : 'Play'}
             </Button>
@@ -190,8 +190,8 @@ const WaveSurferPlayer = (props) => {
               {props.isAnalyzing ? 'Anaylzing' : 'Anaylze'}
             </LoadingButton>
           </Stack>
-          <Stack sx={{paddingRight: '1%', paddingTop: '10px'}} direction={'row'} spacing={{ xs: 1, sm: 2, md: 4 }}>
-            <Slider sx={{width: '80px'}} onChange={handleChange} value={barHeight} min={.1} max={10} step={0.01} aria-label="Default" valueLabelDisplay="off" />
+          <Stack sx={{paddingInline: '1%', paddingTop: '10px'}} direction={'row'} spacing={{ xs: 1, sm: 2, md: 4 }}>
+            <Slider sx={{width: isMobile ? '100%' : '100px'}} onChange={handleChange} value={barHeight} min={.1} max={10} step={0.01} aria-label="Default" valueLabelDisplay="off" />
             <Button size={isLargeScreen ? 'medium' : 'small'} color="primary" variant="contained" endIcon={<PlaceIcon />}>
               {formatTime(currentTime)}
             </Button>
