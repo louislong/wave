@@ -99,7 +99,6 @@ const App = () => {
 
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg')); // screen width > 1200
-  console.warn('ismobile', isMobile)
 
   // Create a Regions plugin instance
   const wsRegions = RegionsPlugin.create();

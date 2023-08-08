@@ -20,11 +20,24 @@ import { Stack } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 import useWavesurfer from '../hooks/useWavesurfer';
+import '../index.css'
 
-const formatTime = (seconds) => {
+const formatTime = (seconds, isDecimal) => {
+  console.warn('seconds', seconds)
+  let secondsRemainder, paddedSeconds
   const minutes = Math.floor(seconds / 60)
-  const secondsRemainder = Math.round(seconds) % 60
-  const paddedSeconds = `0${secondsRemainder}`.slice(-2)
+
+  if (isDecimal) {
+    secondsRemainder = `${Math.floor(seconds) % 60}.${(seconds - Math.floor(seconds)).toFixed(2).slice(-2)}`
+    if (secondsRemainder > 9.99) {
+      paddedSeconds = secondsRemainder
+    } else {
+      paddedSeconds = `0${secondsRemainder}`
+    }
+  } else {
+    secondsRemainder = Math.round(seconds) % 60
+    paddedSeconds = `0${secondsRemainder}`.slice(-2)
+  }
   return `${minutes}:${paddedSeconds}`
 }
 
@@ -139,6 +152,13 @@ const WaveSurferPlayer = (props) => {
             activeRegion = null
           }
         }
+
+        // change css style
+        const host = containerRef.current.querySelector('div')
+        const cursor = host.shadowRoot.querySelector('.cursor')
+        const time = getComputedStyle(document.documentElement).getPropertyValue('--cursor-current-time')
+        document.documentElement.style.setProperty('--cursor-current-time', `'${formatTime(currentTime, false)}'`);
+        console.warn('sdfjaofj', formatTime(currentTime, true), currentTime)
       }),
       wavesurfer.on('decode', (duration) => {
         // set duration time
@@ -171,7 +191,7 @@ const WaveSurferPlayer = (props) => {
 
   return (
     <>
-      <div ref={containerRef} style={{ minHeight: '120px', paddingInline: '1%'}} />
+      <div id='waveform' ref={containerRef} style={{ minHeight: '120px', paddingInline: '1%'}} />
       <div ref={spectrogramRef} style={{margin: '10px auto', position: 'relative', paddingInline: '1%'}} />
       {
         props.wavUrl && 

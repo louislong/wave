@@ -11,3 +11,23 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+:root {
+  --cursor-current-time: '';
+}
+
+#waveform ::part(cursor) {
+  /* height: 100px; */
+  top: 28px;
+  border-radius: 4px;
+  border: 1px solid #fff;
+}
+
+#waveform ::part(cursor):after {
+  content: var(--cursor-current-time);
+  font-size: 0.8em;
+  position: absolute;
+  left: 0;
+  top: -28px;
+  transform: translateX(-50%);
+}
