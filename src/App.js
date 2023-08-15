@@ -6,6 +6,7 @@ import RegionsPlugin from "wavesurfer.js/dist/plugins/regions";
 
 import KeyboardVoiceIcon from '@mui/icons-material/KeyboardVoice';
 import StopRoundedIcon from '@mui/icons-material/StopRounded';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import { ThemeProvider, createTheme, responsiveFontSizes } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { green, purple } from '@mui/material/colors';
@@ -90,7 +91,7 @@ const App = () => {
   const [pcm, setPcm] = useState();
   const [audioUrl, setAudioUrl] = useState();
   const [wavUrl, setWavUrl] = useState();
-  const [wavBlob, setWavBlob] = useState();
+  const [wavFile, setWavFile] = useState();
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [anaylzeResult, setAnalyzeResult] = useState()
   // const [now, setNow] = useState(0)
@@ -115,7 +116,9 @@ const App = () => {
       const audioUrl = URL.createObjectURL(audioBlob);
       setAudioUrl(audioUrl)
       const blob = await getPCM(true, audioBlob)
-      setWavBlob(blob)
+      const file = new File([blob], 'test.wav')
+      console.warn('filesdfsdfsdf', file)
+      setWavFile(file)
       const wavUrl = URL.createObjectURL(blob)
       setWavUrl(wavUrl)
     },
@@ -127,11 +130,9 @@ const App = () => {
   });
 
 
-  const handleData = useCallback(() => {
+  const analyzeData = useCallback((wavFile) => {
     const formData = new FormData();
-    const file = new File([wavBlob], 'test.wav')
-
-    formData.append('file', file);
+    formData.append('file', wavFile);
     setAnalyzeResult(undefined)
     setIsAnalyzing(true)
 
@@ -156,7 +157,7 @@ const App = () => {
       setAnalyzeResult(error)
       console.error('Error:', error);
     });
-  }, [wavBlob])
+  }, [])
 
   const startRecording = useCallback(() => {
     start(TIME_SLICES)
@@ -176,6 +177,15 @@ const App = () => {
     clearInterval(timer.current)
   }, [stop])
 
+  const loadFile = event => {
+    const file = event.target.files[0]
+    console.warn('file', file)
+
+    const url = URL.createObjectURL(file)
+    setAudioUrl(url)
+    setWavUrl(url)
+    setWavFile(file)
+  }
   return (
     <ThemeProvider theme={theme}>
        <Box sx={{ flex: 1, backgroundColor: 'lightgray', flexWrap: 'wrap'}}>
@@ -205,7 +215,7 @@ const App = () => {
                 minPxPerSec={1.5} /** Minimum pixels per second of audio (i.e. zoom level) */
                 wsRegions={wsRegions}
                 interact={true}
-                handleData={handleData}
+                analyzeData={() => analyzeData(wavFile)}
                 isAnalyzing={isAnalyzing}
                 anaylzeResult={anaylzeResult}
                 plugins={[
@@ -222,7 +232,7 @@ const App = () => {
             }
             </Container>
           </Grid>
-          <Grid item xs={1} sx={{minHeight: '15vh' }}>
+          <Grid item xs={1} sx={{minHeight: '15vh', marginTop: '8vh' }}>
             {
               state === 'inactive' ?
               <IconButton disabled={isAnalyzing} onClick={() => startRecording()} >
@@ -233,6 +243,10 @@ const App = () => {
                 <Typography sx={{paddingLeft: '10px', paddingRight: '5px', color: 'white'}} variant="body1">{formatTime(now.current)}</Typography>
               </IconButton>
             }
+            <IconButton sx={{marginLeft: '5vw'}} variant="contained" component="label" disabled={isAnalyzing} >
+              <input accept="audio/wav" onChange={loadFile} hidden type="file" />
+              <FolderOpenIcon sx={{ fontSize: isLargeScreen ? 30 : 25, borderRadius: '100px', padding: '20px', backgroundColor: '#e47911', color: 'white', }} />
+            </IconButton>
           </Grid>
           <Grid sx={{ display: 'flex', minHeight: '15vh' }} item xs={1.5}>
             <Container disableGutters sx={{width: '100vw', paddingInline: '3%', marginBottom: '10px'}}>
