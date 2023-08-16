@@ -31,3 +31,42 @@ code {
   top: -28px;
   transform: translateX(-50%);
 }
+
+#waveform ::part(region-handle) {
+  border-right-width: 10px !important;
+  border-left-width: 10px !important;
+  border-radius: 10px;
+  border-right-color: #fff000 !important;
+  border-left-color: #fff000 !important;
+}
+
+#waveform ::part(region-handle-right):after {
+  content: '...';
+  font-size: 2.5em;
+  color: white;
+  position: absolute;
+  top: 35%;
+  left: 10px;
+  transform: rotate(90deg);
+}
+
+
+#waveform ::part(region-handle-left):after {
+  content: '...';
+  font-size: 2.5em;
+  color: white;
+  position: absolute;
+  top: 35%;
+  left: -6px;
+  transform: rotate(90deg);
+}
+
+.deleteButton {
+  display: block;
+  float: right;
+  padding: 3px;
+  position: relative;
+  z-index: 10;
+  cursor: 'hand';
+  color: '#129fdd';
+}

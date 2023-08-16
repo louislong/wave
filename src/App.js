@@ -18,6 +18,7 @@ import Box from '@mui/material/Box';
 import { Grid } from '@mui/material';
 import Container from '@mui/material/Container';
 import IconButton from '@mui/material/IconButton';
+import Decoder from 'wavesurfer.js/dist/decoder'
 
 import { useMediaRecorder } from './hooks/useMediaRecorder';
 import { Waveform, WaveSurferPlayer } from './components';
@@ -186,6 +187,43 @@ const App = () => {
     setWavUrl(url)
     setWavFile(file)
   }
+
+  const trimAudio = (start, end, wavesurfer) => {
+    if (wavesurfer.isPlaying) {
+      console.warn('hesersdfsdfaof---------------------')
+      wavesurfer.pause()
+    }
+    const originalBuffer = wavesurfer.decodedData;
+    console.warn('region', start, end, originalBuffer)
+    // console.log(end, start,end , start,originalBuffer, (end - start) * (originalBuffer.sampleRate * 1))
+    // let emptySegment = Decoder.createBuffer(
+    //   originalBuffer.getChannelData,
+    //   //segment duration
+    //   (end - start) * (originalBuffer.sampleRate * 1),
+    //   // originalBuffer.sampleRate
+    // );
+    let segmentChanData = []
+    
+    for (let i = 0; i < originalBuffer.numberOfChannels; i++) {
+        let chanData = originalBuffer.getChannelData(i);
+        // let segmentChanData = emptySegment.getChannelData(i);
+        for (let j = 0, len = chanData.length; j < end * originalBuffer.sampleRate; j++) {
+            segmentChanData[j] = chanData[j + (start * originalBuffer.sampleRate)];
+        }
+    }
+    const newBuffer = Decoder.createBuffer(segmentChanData, (end - start))
+    const wav = audioBufferToWav(newBuffer)
+    const blob = new window.Blob([ new DataView(wav) ], {
+      type: 'audio/wav'
+    })
+    const wavUrl = URL.createObjectURL(blob)
+    setAudioUrl(wavUrl)
+    setWavUrl(wavUrl)
+    const file = new File([blob], 'test.wav')
+    setWavFile(file)
+    // wavesurfer.load(wavUrl)
+  }
+
   return (
     <ThemeProvider theme={theme}>
        <Box sx={{ flex: 1, backgroundColor: 'lightgray', flexWrap: 'wrap'}}>
@@ -218,6 +256,7 @@ const App = () => {
                 analyzeData={() => analyzeData(wavFile)}
                 isAnalyzing={isAnalyzing}
                 anaylzeResult={anaylzeResult}
+                trimAudio={trimAudio}
                 plugins={[
                   wsRegions,
                   TimelinePlugin.create(),

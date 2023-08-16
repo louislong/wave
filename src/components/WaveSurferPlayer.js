@@ -11,6 +11,7 @@ import Chip from '@mui/material/Chip';
 import MoodIcon from '@mui/icons-material/Mood';
 import MoodBadIcon from '@mui/icons-material/MoodBad';
 import SendIcon from '@mui/icons-material/Send';
+import CropIcon from '@mui/icons-material/Crop';
 // import Typography from '@mui/material/Typography';
 import SentimentNeutralIcon from '@mui/icons-material/SentimentNeutral';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -20,10 +21,10 @@ import { Stack } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 import useWavesurfer from '../hooks/useWavesurfer';
+
 import '../index.css'
 
 const formatTime = (seconds, isDecimal) => {
-  console.warn('seconds', seconds)
   let secondsRemainder, paddedSeconds
   const minutes = Math.floor(seconds / 60)
 
@@ -53,6 +54,7 @@ const WaveSurferPlayer = (props) => {
   const [barHeight, setBarHeight] = useState(3)
 
   const wavesurfer = useWavesurfer(containerRef, spectrogramRef, props)
+  const { wsRegions } = props
 
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));  // screen width < 600
@@ -72,6 +74,15 @@ const WaveSurferPlayer = (props) => {
       barHeight: newValue
     })
   }, [wavesurfer])
+
+  const handleEdit = useCallback(() => {
+    wsRegions.clearRegions()
+    wsRegions.addRegion({
+      start: wavesurfer.getDuration() / 8,
+      end: wavesurfer.getDuration() - (wavesurfer.getDuration() / 8),
+      color: 'hsla(200, 50%, 70%, 0.3)',
+    });
+  }, [wsRegions, wavesurfer])
 
   const getAnalyzeResultComponent = (result) => {
     const resultArray = result?.split(',')
@@ -106,7 +117,6 @@ const WaveSurferPlayer = (props) => {
 
   // Loop a region on click
   const loop = true
-  const { wsRegions } = props
 
   wsRegions.on('region-clicked', (region, e) => {
     e.stopPropagation() // prevent triggering a click on the waveform
@@ -115,11 +125,72 @@ const WaveSurferPlayer = (props) => {
     region.setOptions({ color: 'rgba(223, 223,112, 0.5)' })
   })
 
-  wsRegions.on('region-dblclicked', (region, e) => {
+  wsRegions.on('region-double-clicked', (region, e) => {
     e.stopPropagation() // prevent triggering a click on the waveform
-    activeRegionRef.current = region
-    region.stop()
-    region.setOptions({ color: 'rgba(123,23,200, 0.5)' })
+    activeRegionRef.current = null // exit region
+    // isPlaying && wavesurfer.pause()
+    console.warn('erer', e)
+    // wavesurfer.pause()
+    // region.stop()
+    region.setOptions({ color: 'hsla(200, 50%, 70%, 0.3)' })
+  })
+
+  wsRegions.on('region-created', (region, e) => {
+    console.log("entered method: region-created", region, e); 
+    if(!region.hasDeleteButton) {
+      let regionEl = region.element;
+      console.warn('regionEL', regionEl.innerHTML)
+
+      let deleteButton = regionEl.appendChild(document.createElement('deletebutton'));
+    
+      deleteButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        region && region.remove();
+      });
+      
+      deleteButton.innerHTML = "✕";
+
+      const deleteButtonStyle = {
+        display: 'block',
+        color: 'white',
+        fontSize: '1.2em',
+        marginRight: '10px',
+        backgroundColor: 'red',
+        float: 'right',
+        padding: '2px',
+        fontWeight: '800',
+        paddingInline: '5px',
+        boxShadow: '0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)',
+      }
+      Object.assign(deleteButton.style, deleteButtonStyle)
+
+      // for cut Button
+      let cropButton = regionEl.appendChild(document.createElement('cropbutton'));
+    
+      cropButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+
+        const start = region.start.toFixed(2);
+        const end = region.end.toFixed(2);
+        props.trimAudio(start, end, wavesurfer)
+      });
+      
+      cropButton.innerHTML = "CROP";
+
+      const cropButtonStyle = {
+        display: 'block',
+        color: 'white',
+        fontSize: '1em',
+        marginLeft: '10px',
+        backgroundColor: '#4caf50',
+        float: 'left',
+        padding: '2px',
+        boxShadow: '0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)',
+      }
+      Object.assign(cropButton.style, cropButtonStyle)
+
+      region.hasDeleteButton = true;    
+    }
   })
 
   // Initialize wavesurfer when the container mounts
@@ -128,6 +199,9 @@ const WaveSurferPlayer = (props) => {
     if (!wavesurfer) return
 
     const subscriptions = [
+      wavesurfer.on("ready",() => {
+        
+      }),
       wavesurfer.on('play', () => {
         console.warn('play wavesurfer')
         setIsPlaying(true)
@@ -135,7 +209,10 @@ const WaveSurferPlayer = (props) => {
       wavesurfer.on('pause', () => {
         console.warn('pause wavesurfer')
         setIsPlaying(false)
-      } ),
+      }),
+      wavesurfer.on('redraw', () => {
+        console.warn('redraw wavesurfer')
+      }),
       // Create some regions at specific time ranges
       // Track the time
       wavesurfer.on('timeupdate', (currentTime) => {
@@ -158,7 +235,7 @@ const WaveSurferPlayer = (props) => {
         const cursor = host.shadowRoot.querySelector('.cursor')
         const time = getComputedStyle(document.documentElement).getPropertyValue('--cursor-current-time')
         document.documentElement.style.setProperty('--cursor-current-time', `'${formatTime(currentTime, false)}'`);
-        console.warn('sdfjaofj', formatTime(currentTime, true), currentTime)
+        // console.warn('sdfjaofj', formatTime(currentTime, true), currentTime)
       }),
       wavesurfer.on('decode', (duration) => {
         // set duration time
@@ -181,7 +258,7 @@ const WaveSurferPlayer = (props) => {
       }),
       wavesurfer.on('interaction', () => {
         activeRegionRef.current = null
-      })
+      }),
     ]
 
     return () => {
@@ -201,12 +278,15 @@ const WaveSurferPlayer = (props) => {
               {isPlaying ? 'Pause' : 'Play'}
             </Button>
             <Button size={isLargeScreen ? 'medium' : 'small'} color="secondary" variant="contained" endIcon={<DownloadIcon />}>
-              <a style={{textDecoration: 'none', color: 'white'}} href={props.wavUrl} download={'recording.wav'} >Download</a>
+              <a style={{textDecoration: 'none', color: 'white'}} href={props.wavUrl} download={`${new Date().toISOString()} recording.wav`} >Download</a>
             </Button>
             <Button size={isLargeScreen ? 'medium' : 'small'} color="secondary" variant="contained" endIcon={<SendIcon />}>
               {'Share'}
             </Button>
-            <LoadingButton size={isLargeScreen ? 'medium' : 'small'} loadingPosition="end" loading={props.isAnalyzing} onClick={props.handleData} color="secondary" variant="contained" endIcon={<TroubleshootIcon />}>
+            <Button size={isLargeScreen ? 'medium' : 'small'} color="secondary" variant="contained" onClick={handleEdit} endIcon={<CropIcon />}>
+              {'Edit'}
+            </Button>
+            <LoadingButton size={isLargeScreen ? 'medium' : 'small'} loadingPosition="end" loading={props.isAnalyzing} onClick={props.analyzeData} color="secondary" variant="contained" endIcon={<TroubleshootIcon />}>
               {props.isAnalyzing ? 'Anaylzing' : 'Anaylze'}
             </LoadingButton>
           </Stack>
