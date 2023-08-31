@@ -17,8 +17,11 @@ import SentimentNeutralIcon from '@mui/icons-material/SentimentNeutral';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 import Button from '@mui/material/Button';
-import { Stack } from '@mui/material';
+import { Stack, formLabelClasses } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+
+import { Widget, addResponseMessage, addUserMessage, setQuickButtons } from 'react-chat-widget';
+import 'react-chat-widget/lib/styles.css';
 
 import useWavesurfer from '../hooks/useWavesurfer';
 
@@ -52,6 +55,11 @@ const WaveSurferPlayer = (props) => {
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState()
   const [barHeight, setBarHeight] = useState(3)
+  const [chatWindowOpen, setChatWindowOpen] = useState(false);
+
+  const handleToggle = () => {
+    setChatWindowOpen(!chatWindowOpen);
+  };
 
   const wavesurfer = useWavesurfer(containerRef, spectrogramRef, props)
   const { wsRegions } = props
@@ -59,6 +67,64 @@ const WaveSurferPlayer = (props) => {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));  // screen width < 600
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('lg')); // screen width > 1200
+
+  useEffect(() => {
+    addResponseMessage("Welcome to Stethy!");
+    const buttons = [{label: 'My Heart Condition', value: 'My Heart Condition'}, {label: 'My Heart Rate', value: 'My Heart Rate'}];
+    setQuickButtons(buttons)
+  }, []);
+
+  const handleNewUserMessage = (newMessage) => {
+    console.log(`New message incoming! ${newMessage}`);
+    // Now send the message throught the backend API
+    const result = props.anaylzeResult
+    if (newMessage.includes('heart condition')) {
+      if (result?.includes('Abnormal Heart')) {
+        addResponseMessage('Doc has estimated your Heart Condition to be abnormal')
+      } else if (result?.includes('Normal Heart')) {
+        addResponseMessage('Doc has estimated your Heart Condition to be normal')
+      } else if (result?.includes('Cannot be determined')) {
+        addResponseMessage('Your doctor could not estimate your heart condition due to poor signal quality')
+      } else {
+        addResponseMessage("While evaluating there could be a sign: Waiting for doctor's evaluation & response")
+      }
+    } else if (newMessage.includes('heart rate')) {
+      const resultArray = result?.split(',')
+      if (resultArray) {
+        addResponseMessage(`Doc evaluated your heart rate to be ${resultArray[1]} bpm`)
+      } else {
+        addResponseMessage("While evaluating there could be a sign: Waiting for doctor's evaluation & response")
+      }
+    } else {
+      addResponseMessage("While evaluating there could be a sign: Waiting for doctor's evaluation & response")
+    }
+  };
+
+  const handleQuickButtonClicked = (buttonValue) => {
+    console.warn('button vlaue', buttonValue)
+    const result = props.anaylzeResult
+    addUserMessage(buttonValue)
+    if (buttonValue === 'My Heart Condition') {
+      if (result?.includes('Abnormal Heart')) {
+        addResponseMessage('Doc has estimated your Heart Condition to be abnormal')
+      } else if (result?.includes('Normal Heart')) {
+        addResponseMessage('Doc has estimated your Heart Condition to be normal')
+      } else if (result?.includes('Cannot be determined')) {
+        addResponseMessage('Your doctor could not estimate your heart condition due to poor signal quality')
+      } else {
+        addResponseMessage("While evaluating there could be a sign: Waiting for doctor's evaluation & response")
+      }
+    } else if (buttonValue === 'My Heart Rate') {
+      const resultArray = result?.split(',')
+      if (resultArray) {
+        addResponseMessage(`Doc evaluated your heart rate to be ${resultArray[1]} bpm`)
+      } else {
+        addResponseMessage("While evaluating there could be a sign: Waiting for doctor's evaluation & response")
+      }
+    } else {
+      addResponseMessage("While evaluating there could be a sign: Waiting for doctor's evaluation & response")
+    }
+  }
 
   // On play button click
   const onPlayClick = useCallback(() => {
@@ -301,6 +367,19 @@ const WaveSurferPlayer = (props) => {
           </Stack>
         </Stack>
       }
+      <div className="App">
+        <Widget
+          handleNewUserMessage={handleNewUserMessage}
+          handleToggle={handleToggle}
+          handleQuickButtonClicked={handleQuickButtonClicked}
+          title="Stethy"
+          subtitle="Stethy Demo"
+          emojis={true}
+          autofocus={false}
+          resizable={true}
+          showCloseButton={true}
+        />
+      </div>
       {
         props.anaylzeResult && getAnalyzeResultComponent(props.anaylzeResult)
       }
