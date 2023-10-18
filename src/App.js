@@ -95,6 +95,7 @@ const App = () => {
   const [wavFile, setWavFile] = useState();
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [anaylzeResult, setAnalyzeResult] = useState()
+  const [anaylzeImage, setAnaylzeImage] = useState()
   // const [now, setNow] = useState(0)
   const now = useRef(0); // this will contain the recorded chunks
   const timer = useRef();
@@ -135,6 +136,7 @@ const App = () => {
     const formData = new FormData();
     formData.append('file', wavFile);
     setAnalyzeResult(undefined)
+    setAnaylzeImage(undefined)
     setIsAnalyzing(true)
 
     fetch('https://stethy.pdi.lab126.a2z.com/StethyAPI', {
@@ -151,6 +153,7 @@ const App = () => {
     .then((result) => {
       setIsAnalyzing(false)
       setAnalyzeResult(result)
+      setAnaylzeImage(wavFile.name.split('.')[0])
       console.log('Success:', result);
     })
     .catch((error) => {
@@ -161,6 +164,7 @@ const App = () => {
   }, [])
 
   const startRecording = useCallback(() => {
+    setAnaylzeImage(undefined)
     start(TIME_SLICES)
     timer.current = setInterval(() => {
       now.current++
@@ -179,6 +183,7 @@ const App = () => {
   }, [stop])
 
   const loadFile = event => {
+    setAnaylzeImage(undefined)
     const file = event.target.files[0]
     console.warn('file', file)
 
@@ -255,6 +260,7 @@ const App = () => {
                 interact={true}
                 analyzeData={() => analyzeData(wavFile)}
                 isAnalyzing={isAnalyzing}
+                anaylzeImage={anaylzeImage}
                 anaylzeResult={anaylzeResult}
                 trimAudio={trimAudio}
                 plugins={[
@@ -271,7 +277,7 @@ const App = () => {
             }
             </Container>
           </Grid>
-          <Grid item xs={1} sx={{minHeight: '15vh', marginTop: '8vh' }}>
+          <Grid item xs={1} sx={{minHeight: '8vh', marginTop: '2vh' }}>
             {
               state === 'inactive' ?
               <IconButton disabled={isAnalyzing} onClick={() => startRecording()} >
@@ -287,6 +293,12 @@ const App = () => {
               <FolderOpenIcon sx={{ fontSize: isLargeScreen ? 30 : 25, borderRadius: '100px', padding: '20px', backgroundColor: '#e47911', color: 'white', }} />
             </IconButton>
           </Grid>
+          {
+            anaylzeImage &&
+            <div style={{paddingInline: '16px', paddingTop: '20px'}}>
+              <img alt='result1' style={{width: '100%'}} src={`https://stethy.pdi.lab126.a2z.com/images/${anaylzeImage}.png`} />
+            </div>
+          }
           <Grid sx={{ display: 'flex', minHeight: '15vh' }} item xs={1.5}>
             <Container disableGutters sx={{width: '100vw', paddingInline: '3%', marginBottom: '10px'}}>
               <Typography variant={isLargeScreen ? 'body2' : 'caption'} sx={{textAlign: 'justify', }}>Disclaimer: Stethy's prototype presented here is for demonstration purposes only and should not be considered a medical device at this stage of development. Hence, it is not intended for diagnosis, treatment, or monitoring of medical conditions. For any health concerns or medical advice, please consult a qualified healthcare professional. No data from the stethoscope or any user inputs will be stored or collected. The data displayed on the screen is simulated and may or may not represent actual patient data. The prototype operates in a stateless manner, and any data generated will be automatically deleted right after the page is refreshed. Please be assured that your privacy is our priority and the creators assume no liability for the handling of data in third-party applications beyond this demo or for any misuse or reliance on the information provided.</Typography>

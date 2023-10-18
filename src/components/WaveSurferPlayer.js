@@ -17,7 +17,7 @@ import SentimentNeutralIcon from '@mui/icons-material/SentimentNeutral';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 import Button from '@mui/material/Button';
-import { Stack, formLabelClasses } from '@mui/material';
+import { Container, Stack, formLabelClasses } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 import { Widget, addResponseMessage, addUserMessage, setQuickButtons } from 'react-chat-widget';
@@ -335,6 +335,12 @@ const WaveSurferPlayer = (props) => {
   return (
     <>
       <div id='waveform' ref={containerRef} style={{ minHeight: '120px', paddingInline: '1%'}} />
+      {
+        props.anaylzeImage &&
+        <div style={{paddingInline: '16px'}}>
+          <img alt='result2' style={{width: '100%'}} src={`https://stethy.pdi.lab126.a2z.com/images/${props.anaylzeImage}_c.png`} />
+        </div>
+      }
       <div ref={spectrogramRef} style={{margin: '10px auto', position: 'relative', paddingInline: '1%'}} />
       {
         props.wavUrl && 
